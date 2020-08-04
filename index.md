@@ -3,11 +3,13 @@ output:
   html_document: default
   pdf_document: default
 ---
-# Ebru Geçici
 
-##Personal Progress Journal
-## IE48A - SPECIAL TOPICS in Essentials of Data analysis
 
-##Assignments
+# **Ebru Geçici**
 
-##[Assignment 1](Introduction.html)
+# *Personal Progress Journal*
+# IE48A - SPECIAL TOPICS in Essentials of Data analysis
+
+# **Assignments**
+
+[Assignment 1](Introduction.html)
