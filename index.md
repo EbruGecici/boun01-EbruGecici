@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 # Ebru Geçici
 
@@ -10,4 +10,4 @@ output:
 
 ##Assignments
 
-##[Assignment 1](Introduction\)
+##[Assignment 1](Introduction.html)
