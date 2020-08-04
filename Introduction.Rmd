@@ -1,0 +1,21 @@
+---
+title: "Introduction"
+author: "Ebru Gecici"
+date: "04/08/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Short Story of My life**
+```
+I am an Industrial Engineer. I graduated from the Yıldız Technical University and now I am the Master student at Boğaziçi University. At the same time, I work in the Yıldız Technical University as academic researcher. 
+
+To get detailed information about my studies, you can visit below web-pages:
+    [Google Akademik](https://scholar.google.com/citations?hl=tr&user=t_fx7jwAAAAJ)  
+    [Linkedin](https://tr.linkedin.com/in/ebrugecici)
+    [Avesis](https://avesis.yildiz.edu.tr/egecici/egitim)
+
+```

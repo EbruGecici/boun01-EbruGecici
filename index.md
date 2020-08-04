@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Ebru Geçici
 
 ##Personal Progress Journal
