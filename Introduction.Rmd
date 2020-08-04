@@ -1,6 +1,6 @@
 ---
-title: "Introduction"
-author: "Ebru Gecici"
+title: "Assignment 1"
+author: "*Ebru Gecici*"
 date: "04/08/2020"
 output: html_document
 ---
@@ -9,13 +9,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**Short Story of My life**
+# **Short Story of My life**
 ```
-I am an Industrial Engineer. I graduated from the Yıldız Technical University and now I am the Master student at Boğaziçi University. At the same time, I work in the Yıldız Technical University as academic researcher. 
+My name is Ebru Geçici and I am an Industrial Engineer. I graduated from the Yıldız Technical University and now I am the Master student at Boğaziçi University. At the same time, I work in the Yıldız Technical University as an academic researcher. 
 
-To get detailed information about my studies, you can visit below web-pages:
+In my academic journey, I especially study optimization problems such as shift scheduling, exam and course scheduling problem, and also energy modeling with mathematical modeling. In addition to these studies, I started to interest the data project. For this purpose, I got some online courses about R Programming. I hope that this course will be an important milestone in my studies.   
+
+Language Skills: 
+- R Programming
+- Python 
+- MS Office 
+
+To get detailed information about my studies, you can visit my web-pages:
 ```
-[Google Akademik](https://scholar.google.com/citations?hl=tr&user=t_fx7jwAAAAJ)  
-[Linkedin](https://tr.linkedin.com/in/ebrugecici) 
+[**Google Akademik**](https://scholar.google.com/citations?hl=tr&user=t_fx7jwAAAAJ)  
+[**Linkedin**](https://tr.linkedin.com/in/ebrugecici)
 
-
+# **Some News About *R* **
