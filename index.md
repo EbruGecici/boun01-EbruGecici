@@ -1,13 +1,4 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
-
-
-# **Ebru Geçici**
-
-# *Personal Progress Journal*
+## **Personal Progress Journal *Ebru Geçici* **
 # IE48A - SPECIAL TOPICS in Essentials of Data analysis
 
 # **Assignments**
