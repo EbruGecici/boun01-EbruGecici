@@ -39,7 +39,12 @@ Today, the most important issue in health care is Covid-19, which is a pandemic 
 
 The essay, *An R view into Epidemiology*, provides information about packages about epidemics. According to the results, there are nearly a hundred packages that take place in the R. Note that these packages information can be obtained by using **pkgserach** and **dlstat** functions, which give information about packages and download information about the packages, respectively. Six of epidemic packages are **DSAIDE**, **epicontacts**,  **EpiEstim**, **EpiModel**, **epitrix**, **surveillance**. This post provides information about these packages. Most of these packages can be used by experts,on the other hand, the documentation of these packages is understandable to both experts, students, and people who are interested in epidemics and R.
 
-For more information, you can visit the [blog page](https://rviews.rstudio.com/2020/05/20/some-r-resources-for-epidemiology/).
+For more information, you can visit the [blog page](https://rviews.rstudio.com/2020/05/20/some-r-resources-for-epidemiology/)
+
+## Analyzing Data from Covid19 R Package
+Another Covid19 related study, which is obtained by using R programming, is posted by R-bloggers. In this post, the Covid19 R package is introduced and some implementation with this package is presented. The used data is collected from the Human Mortality Database. To make analyzing **covid19** function is used. This function contains more information, for this reason, to make an analysis some parts of this information, i.e., country, date, population, and death parameters, are used. After this filtering process, the data is visualized by using **ggplot** function. Then to find the most affected countries, the query was addressed in the post.
+
+To see the detail of the R implementation, you can visit [blog page]( https://www.r-bloggers.com/analyzing-data-from-covid19-r-package/)
 
 
 ## Covid Epidemiology with R
@@ -50,3 +55,6 @@ In shorts, the Covid data can be visualized, analyzed, modeled, and estimated by
 To get more information about the R implementation in Covid19, you can visit [blog page](https://rviews.rstudio.com/2020/03/05/covid-19-epidemiology-with-r/)
 
 
+
+
+###### *Assignment 1 presented by EG*
