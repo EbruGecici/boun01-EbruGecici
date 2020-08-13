@@ -15,15 +15,9 @@ My name is Ebru Geçici and I am an *Industrial Engineer*. I graduated from the 
 
 In my academic journey, I especially study optimization problems such as *shift scheduling*, *exam and course scheduling problem*, and also *energy modeling* with mathematical modeling. In addition to these studies, I started to interest the data project. For this purpose, I got some online courses about R Programming. I hope that this course will be an important milestone in my studies.   
 
-Computer Skills:
 
-- R Programming
-- Python 
-- MS Office 
+To get detailed information about my studies, you can visit:
 
-To get detailed information about my studies, you can visit my web-pages:
-
-[**Google Scholar**](https://scholar.google.com/citations?hl=tr&user=t_fx7jwAAAAJ)  
 [**Linkedin**](https://tr.linkedin.com/in/ebrugecici)
 
 # **Some News About *R* **
