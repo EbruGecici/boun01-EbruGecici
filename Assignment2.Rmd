@@ -466,7 +466,7 @@ EG <- raw_df %>%
 
 ```{r graph of the eg, message = FALSE}
 raw_df%>% 
-    ggplot(aes(x=NegativeIP, y=PositiveIP, color=Date)) + 
+    ggplot(aes(x=NegativeIP, y=PositiveIP, color=Date, size = NegativeIP)) + 
       geom_point() +  
       labs(x ="Negative Imbalance Price", 
            y ="Positive Imbalance Price",  
@@ -474,7 +474,7 @@ raw_df%>%
     theme_minimal()
 ```
 
-
+Point data graph shows that, negative imbalance price and positive imbalance price concentrate in higher value. 
 #### 4. SMP Direction
 Another implementation for the energy usage is about SMP direction.
 
@@ -490,6 +490,8 @@ raw_df %>%
 
 ```
 
+Pie chart shows that, the percentage of the deficit is higher than the percentage of the surplus. That is, the energy demand is higher than the predicted energy demand.
+
 #### 4.2. Number of deficit according to the days
 
 ```{r daily number of energy usage, message=FALSE}
@@ -503,6 +505,7 @@ raw_df %>%
 
 ```
 
+Deficit value is important because when we find the deficit value, we can obtain the under predicted demand. That is, if the deficit occurs, we use more electricity than prediction.
 
 #### 4.3. Graph of number of deficit according to the days
 
@@ -548,6 +551,8 @@ EG <- raw_df %>%
         print(n=5)
 ```
 
+This data shows the number of deficit, surplus, and balance according to hour in a day. To make more clear analysis for this data we can use visualization, which are given in the next section.
+
 #### 4.5. Graph of the energy surplus, energy deficit and balance
 
 When we use the equality to calculate SMP direction, we can obtain surplus, deficit, and balance
@@ -569,5 +574,7 @@ raw_df %>%
   theme_minimal()
 ```
 
+This graph shows that, especially between 15 and 20 pm, the number of deficit is greater than both number of surplus and balance. The deficit means that, the energy demand is more than the predicted energy. That is, in this time interval, the more energy used than the predicted. In contrast to this information, even though there is still more deficit value according to the surplus and balance, this value is closer to surplus and balance value.However, according to the daily analysis, in each hour, we have more deficit value than surplus and balance. That is, we use more energy than predict.
 
-This report gives some basic information about monthly energy market, i.e., MCP,SMP, positive imbalance price, negative imbalance price, and SMP direction. More information about the electricty energy market, you can visit wb page of the [EPIAS](https://www.epias.com.tr/).
+
+This report gives some basic information about monthly energy market, i.e., MCP,SMP, positive imbalance price, negative imbalance price, and SMP direction. More information about the electricity energy market, you can visit web page of the [EPIAS](https://www.epias.com.tr/).
