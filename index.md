@@ -6,7 +6,7 @@
 
 ### **Assignments**
 
-#### Week 1
+### Week 1
 ##### Assignment 1: *R Markdown*
 
 
@@ -16,7 +16,7 @@ The information in the assignment 1 is related to Covid-19 and R combination. In
 [R Markdown](Introduction.html)
 
 
-#### Week 2
+### Week 2
 ##### Assignment 2: *Electricty Market Price*
 
 The second assignment is related to implementation and practise of the dplyr() function and ggplot() function.
