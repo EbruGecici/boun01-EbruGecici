@@ -1,0 +1,573 @@
+---
+title: "Assignment 2"
+author: "Ebru Gecici"
+date: "16/08/2020"
+output:
+  html_document: default
+  word_document: default
+---
+This report includes implementation of the **dplyr()** function and **ggplot()** function by using EPIAS 01-31 July 2020 data. To make analysis, first the data is rearranged to analyze and then required calculations are made to get meaningful outputs. By using this outputs, interpretation can be made for July 2020.
+
+More detailed from different time frame can be found in the [EPIAS](https://rapor.epias.com.tr/rapor/xhtml/ptfSmfListeleme.xhtml). 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Implementation of the dplyr() and ggplot()
+## EPIAS Electricty Report
+
+Electricity market provide transparency, competition and  integration with other electricity markets. Main purpose of this system is to provide stronger achievement in the dynamic system [(1)](https://www.epias.com.tr/en/day-ahead-market/introduction/). For this reason, to provide more information and obtain better prediction about the future energy market, there are available data sets. By analyzing this data, balanced energy market can be achieved. The balanced electricity market means that the produced and consumed energy are in the same level. That is, you produce electricity that you needs. As the price of the electricity in huge amounts, especially in this technology era, this is more important.
+
+To start basic implementation about the electricity price, this report is prepared. In this report, *July 2020* data is used.This data consists of six different values: 
+
+  (1) date, 
+  (2) market clearing price, 
+  (3) system marginal price, 
+  (4) positive imbalance price,
+  (5) negative imbalance price,
+  (6) system marginal price direction.
+  
+The **date** is the date information, i.e., day, month, year and the hour, minute, second information. The **market clearing price** is obtain when the produced/supplied is equal to consumed price. This price is also called  *equilibrium price*. **System marginal price**, on the other hand, is used in the imbalance/ in-equilibrium point.  If there is energy deficit in system, the lowest price for electricity is offered, whereas, if there is energy surplus in the system the highest price is offered. By using these classification, deficit and surplus, the system marginal price direction is defined [(2)](https://www.epias.com.tr/en/balancing-market/system-marginal-price-smp/#:~:text=System%20marginal%20price%20is%20calculated,energy%20surplus%20in%20the%20system.). When the energy demand is more than the predicted demand, **deficit** is occurred in the system. In contrast to deficit, when the energy demand is lower than the predicted demand, **surplus** is observed. If market clearing price is greater than the system marginal price, the energy surplus is obtained, otherwise we get energy deficit in the system. Moreover, by using market clearing price and system marginal price, we obtain positive **imbalance price** and **negative imbalance price**:
+  
+  - Positive Imbalance Price = min(MCP,SMP)*0.97
+  
+  - Negative Imbalance Price = max(MCP,SMP)*1.03
+
+These calculations show that market operator penalize the system [(3)](https://boun-ie48a.github.io/files/electricity_markets_mini_tutorial) and this process is called imbalance price. 
+
+### 1. DATA MANUPILATION
+#### 1.1. Data 
+
+To make analysis, we first load the packages and manipulate the data to obtain clearer results. For this, after the loading of the data, we check the data type for the calculations.
+
+```{r data manuplation, message=FALSE }
+#we call required packages from the packages which are "tidyverse" and "lubridate"
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+#we upload data, which is csv file format, by using read.csv() function
+EpiasData <- read.csv("ptf-smf.csv")
+#after the control of the data we can examine columns in the data by using glimpse() function
+EpiasData %>%
+  glimpse()
+
+#then we control our date type because in the functions we need date type
+is.Date(EpiasData$Date)
+#as the date column is not date type, first we convert "." to "-" by using gsub() function
+EpiasData$Date <- gsub(pattern = "\\.","-",EpiasData$Date)
+#after the changing we transform our date time from character to dttm by using a function of lubridate which is as.POSIXct
+EpiasData$Date <- as.POSIXct(EpiasData$Date,format="%d-%m-%y %H:%M")
+#control of the process
+EpiasData %>%
+  glimpse()
+```
+
+#### 1.2. Rename columns and rearrange the data frame
+
+To provide more understandable data, I change the name of the column. This process is provide the uses to get clear information about data.
+
+```{r pressure, message=FALSE}
+#then, I changed the name of the column by using transmute() function with pipe operator. And then I assigned this process into
+# raw_df name as a data frame. After this process, we have usable data frame
+raw_df <- EpiasData %>%
+  transmute(Date,
+            #rename of the MCP. column
+            MCP = MCP., 
+            SMP = SMP., 
+            PositiveIP = Positive.Imbalance.Price..TL.MWh.,
+            NegativeIP = Negative.Imbalance.Price..TL.MWh.,
+            SMPDirection = SMP.Direction) 
+
+#showing first sith raw of the data frame
+head(raw_df)
+```
+
+The output shows that, Our data frame is ready for the calculations. That is, the class of the date is changed from character to date-time (dttm). By using this type, we can use *lubridate()* function to calculate, group, etc. 
+After the data manipulation, we start to analyze. The rest of the report is arranged as follow. In the first part of the analysis section, MCP is given. Then the SMP and its relation with the MCP is taken into account. After that, the imbalance price analyzed. Finally, the SMP direction is investigated.
+
+### 2. ANALYSIS
+In the analysis of clear data, 
+
+  - First, I give the visualized outputs to make interpretation,
+  - Then, I give the calculated outputs
+
+In both, dplyr() function is to prepare and manipulate the data frame for visualization and mathematical analyses.
+Basic Information About Data (note that the more information about this values are explaned in the previous section):
+
+  - **MCP**: Market Clearing Price 
+  - **SMP**: System Marginal Price
+  - **PositiveIP**: Positive Imbalance Price
+  - **NegativeIP**: Negative Imbalace Price
+  - **SMPDirection**: Sytem Marginal Price Direction
+
+#### 2.1. MCP
+
+#### 2.1.1. Hourly MCP
+
+By using minimum and maximum value of the hourly MCP by using following function.
+
+```{r min and max value,include=TRUE, message=FALSE}
+raw_df %>%
+        select(Date, MCP)%>%
+        #first we group our data according to the hours
+        group_by(Hour = lubridate::hour(Date))%>%
+        #then we calculate average value of MCP hour each our
+        summarise(MinMCP_Hour = min(MCP),
+                  MaxMCP_Hour = max(MCP))%>%
+        #ungproup
+        ungroup()%>%
+        #to provide sorting of the data hourly minimum MCP and hourly maximum MCP from smallest to largest 
+        arrange(MinMCP_Hour,MaxMCP_Hour)%>%
+        print(n=3)
+```
+Results show that, in the sixth hour, the minimum MCP value can be observed in the minimum and the maximum MCP values. The sixth hour refers to 5 am. 
+
+
+#### 2.1.2. Graph of the öinimum and maximum values of the MCP according to the hours
+
+```{r graph of the min and max values, message=FALSE}
+raw_df%>%
+  #group according to the hours
+  group_by(Hours=lubridate::hour(Date))%>%
+  #finding minimum and maximum value of the MCP  
+  summarise(MinMCP_Hour = min(MCP),
+            MaxMCP_Hour = max(MCP))%>%
+  #to visualize these min and max values by using ggplot() function according to the hours
+  ggplot(aes(x=Hours)) +
+    #define lines in the graph
+    geom_line(aes(y = MinMCP_Hour, color = "Minimum hourly MCP"))+
+    geom_line(aes(y = MaxMCP_Hour, color = "Maximum hourly MCP"))+
+    #give a name to the graph
+    labs( title = "Minimum and Maximum Hourly MCP Values",
+          subtitle = "EPIAS JULY 2020")+
+    #type of the graph, these function provide white canvas 
+    theme_minimal()
+
+```
+
+After the this calculations for each hour, we can also obtain hourly average MCP values and we can illustrates in the graph like as follow. While the minimum value of the MCP is observed in the sixth hour, the average is minimum in this hour. This is fact. Moreover, if the minimum value is too close to maximum MCP value, we can obtain higher average value of MCP in the hourly results.
+
+#### 2.1.3. Graph of the hourly average MCP value 
+
+```{r hourly average MCP, include=TRUE, message=FALSE}
+#After all this process by using raw_df data frame, we can make analysis about the EPIAS data which is related to electricity
+#Daily average MCP
+plot1<-raw_df %>%
+        #first we group our data according to the hours
+        group_by(Hours = lubridate::hour(Date))%>%
+        #then we calculate average value of MCP hour each our
+        summarise(#daily_total_MCP = sum(MCP),
+                  hourly_average_MCP = mean(MCP))
+#to visualize the result we use ggplot() function, which gives the canvas of the graph
+ggplot(plot1, aes(x = Hours)) +
+  #geom_line() gives the line graph
+  geom_line(aes(y= hourly_average_MCP, color="Hourly average MCP")) + 
+  labs(x = "Hour", y = "Hourly Average MCP (TL/MWh)",
+       title = "Hourly Market Clearing Price - MPC",
+       subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
+  theme_minimal()
+```
+
+In addition to the hourly analysis of the MCP, we can also make these calculations for each day. For this purpose, first we define minimum and maximum value of each day, and then we calculate average value of the daily MCP value. Finally, by using visualization tools, the outputs can be analyzed. 
+
+#### 2.1.4. Weekly MCP
+- WA_MCP : Weekly Average MCP value
+
+```{r weekly average MCP value, message = FALSE}
+EG <- raw_df %>%
+        group_by(Week=lubridate::week(Date))%>%
+        summarise(WA_MCP = mean(MCP),
+                  MinMCP = min(MCP), 
+                  MaxMCP = max(MCP))
+
+knitr::kable(EG, format="markdown")
+```
+
+#### 2.1.5. Graph of weekly MCP
+
+```{r weekly average MCP, message=FALSE}
+#Minimum and maximum value of the MCP according to the day
+raw_df %>%
+  group_by(Week=lubridate::week(Date))%>%
+  summarise(MinMCP = min(MCP), MaxMCP = max(MCP), Average = mean(MCP))%>%
+  ggplot(aes(x=Week)) +
+    geom_line(aes(y = MinMCP, color = "Minimum MCP")) +
+    geom_line(aes(y = MaxMCP, color = "Maximum MCP")) +
+    geom_line(aes(y = Average, color = "Average MCP")) +
+    labs(x = "Week",
+         y = "TL/MWh",
+         title = "Extreme values of the MCP",
+         subtitle = "EPIAS 01-31 July 2020") +
+    theme_minimal()
+```
+
+According to the result of the minimum and maximum of the daily MCP analysis, Minimum value is observed in the 13th day of July, and maximum value of the minimum daily MCP is observed in the 3th day of the July. In addition to the minimum MCPs', minimum and maximum of the maximum daily MCP value are observed in 10th July and 6th, 24th, 27th and 29th July, respectively.
+
+#### 2.1.6. Daily MCP
+- DA_MCP : Daily Average MCP value
+
+```{r daily average MCP value, message = FALSE}
+raw_df %>%
+  group_by(Day=lubridate::day(Date))%>%
+  summarise(DA_MCP = mean(MCP))
+```
+
+#### 2.1.7. Graph of daily MCP
+
+```{r daily average MCP, message=FALSE}
+#Minimum and maximum value of the MCP according to the day
+raw_df %>%
+  group_by(Day=lubridate::day(Date))%>%
+  summarise(MinMCP = min(MCP), MaxMCP = max(MCP), Average = mean(MCP))%>%
+  ggplot(aes(x=Day)) +
+    geom_line(aes(y = MinMCP, color = "Minimum MCP")) +
+    geom_line(aes(y = MaxMCP, color = "Maximum MCP")) +
+    geom_line(aes(y = Average, color = "Average MCP")) +
+    labs(x = "Day",
+         y = "TL/MWh",
+         title = "Minimum and Maximum value of the MCP",
+         subtitle = "EPIAS 01-31 July 2020") +
+    theme_minimal()
+```
+
+According to the result of the minimum and maximum of the daily MCP analysis, Minimum value is observed in the 13th day of July, and maximum value of the minimum daily MCP is observed in the 3th day of the July. In addition to the minimum MCPs', minimum and maximum of the maximum daily MCP value are observed in 10th July and 6th, 24th, 27th and 29th July, respectively.
+
+
+#### 2.1.8. Percentage of change of daily MCP
+
+```{r, daily change of the MCP value, message=FALSE}
+EG <- raw_df %>%
+        select(Date, MCP)%>%
+        group_by(Day = lubridate::day(Date))%>%
+        summarise(DailyMCP = sum(MCP)) %>%
+        ungroup()%>%
+        mutate(DailyMCPNext=lag(DailyMCP,1))%>%
+        transmute(Day, DailyMCP,DailyMCPNext, percentage=((DailyMCPNext-DailyMCP)/DailyMCP)-1)%>%
+        arrange(desc(percentage))
+
+#knitr::kable(EG, format="markdown")
+```
+
+#### 2.2. SMP
+
+#### 2.2.1 Hourly change of the SMP 
+
+```{r hourly average value of the SMP, message = FALSE}
+raw_df%>%
+  group_by(Day=lubridate::day(Date))%>%
+  summarise(Average_SMP = mean(SMP),
+            Min_SMP = min(SMP),
+            Max_SMP = max(SMP))
+```
+
+#### 2.2.2 Graph of hourly change of the SMP
+
+```{r graph of hourly average value of the SMP, message = FALSE}
+raw_df%>%
+  group_by(Day=lubridate::day(Date))%>%
+  summarise(Average_SMP = mean(SMP),
+            Min_SMP = min(SMP),
+            Max_SMP = max(SMP)) %>%
+  
+  ggplot(aes(x=Day, color = "Days"))+
+    geom_line(aes(y = Average_SMP, color = "Average daily SMP")) +
+    geom_line(aes(y = Min_SMP, color = "Minimum daily SMP")) +
+    geom_line(aes(y = Max_SMP, color = "Maximum daily SMP")) +
+    theme_minimal()
+```
+
+#### 2.2.3 Weekly change of the SMP 
+
+```{r weekly average value of the SMP, message = FALSE}
+EG<- raw_df%>%
+      group_by(Week=lubridate::week(Date))%>%
+      summarise(Average_SMP = mean(SMP),
+                Min_SMP = min(SMP),
+                Max_SMP = max(SMP))
+#this line provide table format in the R markdown page
+knitr::kable(EG, format="markdown")
+```
+
+#### 2.2.4 Graph of weekly change of the SMP
+
+```{r graph of weekly average value of the SMP, message = FALSE}
+raw_df%>%
+  group_by(Week=lubridate::week(Date))%>%
+  summarise(Average_SMP = mean(SMP),
+            Min_SMP = min(SMP),
+            Max_SMP = max(SMP)) %>%
+  
+  ggplot(aes(x=Week, color = "Days"))+
+    geom_line(aes(y = Average_SMP, color = "Average weekly SMP")) +
+    geom_line(aes(y = Min_SMP, color = "Minimum weekly SMP")) +
+    geom_line(aes(y = Max_SMP, color = "Maximum weekly SMP")) +
+    theme_minimal()
+```
+
+
+#### 2.3. Relationship Between MCP and SMP
+
+#### 2.3.1. MCP and SMP
+
+We can obtain daily average value of the MCP and SMP by using following lines:
+
+```{r daily aevrage of the MCP and SMP, message=FALSE}
+#average value of the MCP in weeks
+EG <- raw_df %>%
+        group_by(Day = lubridate::day(Date))%>%
+        summarise(Average_MCP = mean(MCP),
+                  Average_SMP = mean(SMP),
+                  Difference = abs(mean(MCP) - mean(SMP))) %>%
+        ungroup()%>%
+        arrange(desc(Difference))
+
+knitr::kable(EG, format="markdown")
+```
+
+#### 2.3.2. Graph of the relationship between MCP and SMP
+
+Graph of the daily average value of MCP and SCP with line graph
+
+```{r graph of daily aevrage of the MCP and SMP, message=FALSE}
+#average value of the MCP in weeks
+raw_df %>%
+  group_by(Day = lubridate::day(Date))%>%
+  summarise(Daily_MCP = mean(MCP),
+            Daily_SMP = mean(SMP)) %>%
+  
+  ggplot(aes(x = Day)) +
+    geom_line(aes(y = Daily_MCP, color = "Daily Average MCP")) +
+    geom_line(aes(y = Daily_SMP, color = "Daily Average SMP")) +
+    theme_minimal()
+```
+
+#### 2.3.3. The weekly relationship between MCP and SMP
+
+We can obtain weekly average value of the MCP and SMP by using following lines:
+
+```{r weekly aevrage of the MCP and SMP, message=FALSE}
+#average value of the MCP in weeks
+raw_df %>%
+  group_by(Week = lubridate::week(Date))%>%
+  summarise(Weekly_MCP = mean(MCP),
+            Weekly_SMP = mean(SMP),
+            Difference = abs(mean(MCP) - mean(SMP))) %>%
+  ungroup()%>%
+  arrange(desc(Difference))
+```
+
+#### 2.3.4. Graph of the weekly relationship between MCP and SMP
+
+```{r weekly aevrage of the MCP and SMP graph, i.e., according to the difference, message=FALSE}
+#average value of the MCP in weeks
+raw_df %>%
+  group_by(Week = lubridate::week(Date))%>%
+  summarise(Weekly_MCP = mean(MCP),
+            Weekly_SMP = mean(SMP),
+            Difference = abs(mean(MCP) - mean(SMP))) %>%
+
+  ggplot(aes(x = Week, y = Difference, fill = "Weeks")) +
+    geom_bar(stat = "identity")
+```
+
+#### 2.3.5. Graph of the daily relationship between MCP and SMP
+
+After the calculation of the weekly average, we can visualize the daily average of MCP and SMP values by following. 
+
+```{r daily average of the MCP and SMP in the , message=FALSE}
+#Daily change of average change MCP-SMP
+raw_df %>%
+  group_by(Time=lubridate::day(Date))%>%
+  summarise(Daily_MCP = mean(MCP), Daily_SMP = mean(SMP)) %>%
+  ggplot(aes(x=Time)) + 
+    geom_line(aes(y=Daily_MCP, color = "Daily MCP")) +
+    geom_line(aes(y=Daily_SMP, color = "Daily SMP")) +
+    labs(x = "Day", y = "TL/MWh",
+       title = "Daily MCP-SMP Change Graph",
+       subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
+  theme_minimal()
+```
+
+#### 2.3.6. Graph of the daily relationship between MCP and SMP
+
+```{r difference between daily average value of the MCP and SMP, message=FALSE}
+#Daily change of average change MCP-SMP
+raw_df %>%
+  group_by(Time=lubridate::day(Date))%>%
+  summarise(Daily_MCP = mean(MCP), 
+            Daily_SMP = mean(SMP),
+            Difference = abs(mean(MCP)-mean(SMP))) %>%
+  ggplot(aes(x=Time)) + 
+    geom_line(aes(y = Difference, color = "Difference of average values")) +
+    labs(x = "Day", y = "TL/MWh",
+       title = "Difference between Daily average MCP-SMP Change Graph",
+       subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
+  theme_minimal()
+```
+
+The results show that the highest difference between the daily average value of the MCP and daily average value of the SMP is observed in the eighth day.
+
+### 3. Posivite and Negative Imbalance Price
+
+#### 3.1. Negative and positive inbalance price in first day
+
+```{r negative and positive imbalance price first day, message = FALSE}
+raw_df %>%
+  select(Date, PositiveIP, NegativeIP)%>%
+  group_by(Day = lubridate::day(Date), Hour = lubridate::hour(Date))%>%
+  select(Day,Hour, PositiveIP, NegativeIP)%>%
+  filter(Day==1)%>%
+  
+  ggplot(aes(Hour, color = "Hours"))+
+    geom_line(aes(y=PositiveIP, color = "Positive imbalance price")) +
+    geom_line(aes(y=NegativeIP, color = "Negative imbalance price")) +
+    labs(x = "Hours", y = "TL/MWh",
+         title= "Pozitive and Negative Imbalance Price of First Day",
+         subtitle = "EPIAS July 01, 2020") +
+    theme_minimal()
+```
+
+#### 3.2. Negative and positive inbalance price in last day
+
+```{r negative and positive imbalance price last day, message = FALSE}
+raw_df %>%
+  select(Date, PositiveIP, NegativeIP)%>%
+  group_by(Day = lubridate::day(Date), Hour = lubridate::hour(Date))%>%
+  select(Day,Hour, PositiveIP, NegativeIP)%>%
+  filter(Day==31)%>%
+  
+  ggplot(aes(Hour, color = "Hours"))+
+    geom_line(aes(y=PositiveIP, color = "Positive imbalance price")) +
+    geom_line(aes(y=NegativeIP, color = "Negative imbalance price")) +
+    labs(x = "Hours", y = "TL/MWh",
+         title= "Pozitive and Negative Imbalance Price of Last Day",
+         subtitle = "EPIAS July 31, 2020") +
+    theme_minimal()
+  
+  
+```
+
+#### 3.3. Daily difference of negative and positive inbalance price
+
+```{r, maximum difference between negative and positive imbalance price, message = FALSE}
+EG <- raw_df %>%
+        select(Date, PositiveIP, NegativeIP)%>%
+        group_by(Day = lubridate::day(Date), Hour = lubridate::hour(Date))%>%
+        select(Day,Hour, PositiveIP, NegativeIP)%>%
+        transmute(Day,Hour,PositiveIP, NegativeIP, difference=NegativeIP-PositiveIP)%>%
+        ungroup()%>%
+        arrange(desc(difference)) %>%
+        print(n=10)
+
+```
+
+#### 3.4. Graph of daily difference of negative and positive inbalance price
+
+```{r graph of the eg, message = FALSE}
+raw_df%>% 
+    ggplot(aes(x=NegativeIP, y=PositiveIP, color=Date)) + 
+      geom_point() +  
+      labs(x ="Negative Imbalance Price", 
+           y ="Positive Imbalance Price",  
+           title="Negative Imbalance and Positive Imbalance Prices") +
+    theme_minimal()
+```
+
+
+#### 4. SMP Direction
+Another implementation for the energy usage is about SMP direction.
+
+#### 4.1. Pie chart of SMP direction
+
+```{r daily energy usage ,message=FALSE}
+raw_df %>%
+  group_by(Hours = lubridate::hour(Date))%>%
+  transmute(EnergyUsage = ifelse(SMPDirection == "?Energy Surplus", "Surplus", "Deficit")) %>%
+  ggplot(aes(x = "", y=EnergyUsage, fill=EnergyUsage)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y")
+
+```
+
+#### 4.2. Number of deficit according to the days
+
+```{r daily number of energy usage, message=FALSE}
+raw_df %>%
+  group_by(Hours = lubridate::hour(Date))%>%
+  transmute(EnergyUsage = ifelse(SMPDirection == "?Energy Surplus", "Surplus", "Deficit")) %>%
+  group_by(EnergyUsage, Hours) %>%
+  filter(EnergyUsage=="Deficit") %>%
+  summarise(EnegyUsageNumber = n())%>%
+  print(n=10)
+
+```
+
+
+#### 4.3. Graph of number of deficit according to the days
+
+```{r bar chart of the deficit energy usage according to the hours, message=FALSE}
+raw_df %>%
+  group_by(Hours = lubridate::hour(Date))%>%
+  transmute(EnergyUsage = ifelse(SMPDirection == "?Energy Surplus", "Surplus", "Deficit")) %>%
+  group_by(EnergyUsage, Hours) %>%
+  filter(EnergyUsage=="Deficit") %>%
+  summarise(EnergyUsageNumber = n())%>%
+  
+  ggplot(aes(x = Hours, y = EnergyUsageNumber, fill = EnergyUsageNumber)) +
+    geom_bar(stat = "identity") +
+    theme_minimal()
+
+```
+
+This bar chart shows the hourly number of deficit energy usage. This result shows that the more deficit energy usage observed in the 6 pm.In other words, this graph also shows the energy usage.In toher words, this data show that the eighth and ninth days have no deficit.
+
+
+```{r difference of the surplus and deficit, message=FALSE, include = FALSE}
+raw_df %>%
+  group_by(Hours = lubridate::hour(Date))%>%
+  transmute(Day=lubridate::day(Date), EnergyUsage = ifelse(SMPDirection == "?Energy Surplus", "Surplus", "Deficit")) %>%
+  group_by(EnergyUsage, Day) %>%
+  filter(EnergyUsage == "Deficit") %>%
+  summarise(Deficit = n())%>%
+  ungroup()%>%
+  transmute(Day, Surplus = ifelse(Deficit>0, abs(24-Deficit),24), Deficit)%>%
+
+  select(Day,Surplus, Deficit)
+
+```
+
+#### 4.4. Classification of the energy surplus, energy deficit and balance
+
+When we use the equality to calculate SMP direction, we can obtain surplus, deficit, and balance
+
+```{r Classification of the energy surplus, energy deficit and balance, message=FALSE}
+EG <- raw_df %>% 
+        group_by(Hour = lubridate::hour(Date))%>% 
+        transmute(Hour, Surplus = sum(MCP>SMP), Deficit=sum(MCP<SMP), Balance=sum(MCP==SMP))%>%
+        print(n=5)
+```
+
+#### 4.5. Graph of the energy surplus, energy deficit and balance
+
+When we use the equality to calculate SMP direction, we can obtain surplus, deficit, and balance
+
+```{r graph of the energy surplus, energy deficit and balance, message=FALSE}
+raw_df %>% 
+  group_by(Hour = lubridate::hour(Date))%>% 
+  transmute(Hour, Surplus = sum(MCP>SMP), Deficit = sum(MCP<SMP), Balance = sum(MCP==SMP))%>%
+ 
+  ggplot(aes(x = Hour, color = "Hours")) +
+    geom_line(aes(y = Surplus, color = "Number of surplus")) +
+    geom_line(aes(y = Deficit, color = "Number of deficit")) +
+    geom_line(aes(y = Balance, color = "Number of balance")) +
+    
+  labs(x = "Hour",
+       y = "Numbers",
+       title = "Number of surplus, deficit, and balance",
+       subtitle = "EPIAS July 2020") +
+  theme_minimal()
+```
+
+
+This report gives some basic information about monthly energy market, i.e., MCP,SMP, positive imbalance price, negative imbalance price, and SMP direction. More information about the electricty energy market, you can visit wb page of the [EPIAS](https://www.epias.com.tr/).
