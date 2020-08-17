@@ -4,7 +4,7 @@
 ## Welcome to My Personal Progress Journal
 # IE48A - SPECIAL TOPICS in Essentials of Data analysis
 
-# **Assignments**
+### **Assignments**
 
 #### Week 1
 ##### Assignment 1: *R Markdown*
@@ -25,4 +25,4 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 [dplyr() and ggplot()](Assignment2.html)
 
 
-# **Exercises**
+### **Exercises**
