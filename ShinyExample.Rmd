@@ -156,4 +156,6 @@ This shiny can be updated by using different type of the buttons and other usefu
 
 In this example the shiny app can be accessed by using **shiny:runApp('GitHub/boun01-EbruGecici/EbruNazlı')**.
 
-Note: In this example, to make more efficient learning information and application, I study with [N. Nazlı Gül](https://pjournal.github.io/boun01-NazliGul/). 
+
+
+*Note*: In this example, to make more efficient learning information and application, I study with [N. Nazlı Gül](https://pjournal.github.io/boun01-NazliGul/). 
