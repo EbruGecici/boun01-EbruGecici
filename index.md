@@ -26,3 +26,13 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
 
 ### **Exercises**
+
+### Week 1
+
+### Week 2
+
+### Week 3
+In this exercise, there is a basic shiny app implementation can be found. In this example Movies are used to create inteactive ggplot application by using shiny() package.
+
+[Shiny App - Movie Example](ShinyExample.html)
+
