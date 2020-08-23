@@ -27,9 +27,6 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
 ### **Exercises**
 
-### Week 1
-
-### Week 2
 
 ### Week 3
 
