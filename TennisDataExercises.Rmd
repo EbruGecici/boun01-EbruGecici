@@ -1,0 +1,37 @@
+---
+title: "Tennis Data Analysis"
+author: "Ebru Gecici"
+date: "25 08 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = TRUE, message=FALSE}
+load("C:\\Users\\Ebru Geçici\\OneDrive\\Belgeler\\GitHub\\boun01-EbruGecici\\atp_tennis_data_2017.RData")
+library(tidyverse)
+library(dplyr)
+
+#rename of the data sets
+player <-player_df 
+score <- score_df
+stats <- stats_df
+tourney <- tourney_df 
+rank <- rank_df
+```
+
+data frames in the tennis data:
+
+- player_df
+- score_df
+- stats_df
+- tourney_df
+- rank_df
+
+
+```{r}
+player %>% glimpse()
+```
+
