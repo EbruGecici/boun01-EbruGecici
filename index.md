@@ -34,3 +34,8 @@ In this exercise, there is a basic shiny app implementation can be found. In thi
 
 - [Shiny App - Movie Example](ShinyExample.html)
 
+### Week 4
+
+Exercise 1: The trial of the implementation of the join function. In this example, the course examples are re-maded to understand the logic of the `join()` function. You can also reach these examples in course page. 
+
+- [Join First Trial](JoinFirstExercise.html)
