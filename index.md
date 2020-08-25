@@ -23,7 +23,6 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
 ### **Exercises**
 
-
 ### Week 3
 
 In this exercise, there is a basic shiny app implementation can be found. In this example Movies are used to create inteactive ggplot application by using shiny() package..
@@ -32,6 +31,6 @@ In this exercise, there is a basic shiny app implementation can be found. In thi
 
 ### Week 4
 
-Exercise 1: The trial of the implementation of the join function. In this example, the course examples are re-maded to understand the logic of the `join()` function. You can also reach these examples in course page. 
+**Exercise 1**: The trial of the implementation of the join function. In this example, the course examples are re-maded to understand the logic of the `join()` function. You can also reach these examples in course page. 
 
 - [Join First Trial](JoinFirstExercise.html)
