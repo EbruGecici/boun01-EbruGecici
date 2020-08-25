@@ -2,7 +2,11 @@
 title: "Join First Exercises"
 author: "Ebru Gecici"
 date: "25 08 2020"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
@@ -58,6 +62,8 @@ In these examples:
 In the left join, the all rows of X are preserved and the only relevant columns of y is used.
 If there is no matching of the x values on the y table, this rows returns `NA` values.
 
+`Left Join: All rows of X are preserved, only relevant rows Y and multiply rows if there are matching.`  
+
 **Note that**, the logic behind the right join is same as the left join. For this reason, to prevent confusion, only one of them can be used.
 
 ```{r, left join}
@@ -65,6 +71,8 @@ left_join(superheroes, publishers, by="publisher")
 ```
 
 ### 2. Inner Join
+
+`Inner Join: Only rows with common value are returned and rws rae multiplied if there are multiple matchings`
 
 ```{r, inner join}
 inner_join(superheroes, publishers, by="publisher")
@@ -75,6 +83,8 @@ Inner join is similar with the left join, but there is difference in the NA valu
 
 ### 3. Semi Join
 
+`Semi Join: Very similar to inner join but without columns from Y `
+
 ```{r, semi join}
 semi_join(superheroes, publishers, by="publisher")
 ```
@@ -84,6 +94,8 @@ This function provide the merged of the data sets but, it does not include the N
 
 ### 4. Full Join
 
+`Full join returns all rows and columns from both X and Y and both multiple mathcings and compensates for missing`
+
 ```{r, Full Join}
 full_join(superheroes, publishers, by = "publisher")
 ```
@@ -92,6 +104,8 @@ Full join, merged all data of the superheroes and publishers. For this reason, w
 
 
 ### 5. Anti Join
+
+`Anti join returns all rows from X which do not have information (based on key column) in Y and returns only columns from X.`
 
 ```{r, anti join for superheroes}
 anti_join(superheroes, publishers, by = "publisher")
@@ -105,3 +119,7 @@ anti_join(publishers, superheroes, by="publisher")
 ```
 
 In the second anti join function, we use publishers as x values. For this reason, the function shows that the value which does not take part in the y data set, i.e., superheroes in this trial.
+
+### 6. Reference
+
+This examples are made according to the information in the IE48A class and also the data used from the study of [Stat545](https://stat545.com/join-cheatsheet.html).
