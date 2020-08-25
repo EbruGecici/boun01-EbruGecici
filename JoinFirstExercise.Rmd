@@ -1,0 +1,107 @@
+---
+title: "Join First Exercises"
+author: "Ebru Gecici"
+date: "25 08 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+To get information about the `join()`  function, which belongs to `tidyverse` package, this exercises are made by using [tutorial](https://stat545.com/join-cheatsheet.html).
+
+There are some join functions:
+
+- `left_join()` and `right_join()`
+
+- `inner_join()`
+
+- `semi_join()`
+
+- `full_join()`
+
+- ` anti_join()`
+
+```{r, data set, message = FALSE}
+library(tidyverse) ## dplyr provides the join functions
+
+superheroes <- tibble::tribble(
+       ~name, ~alignment,  ~gender,          ~publisher,
+   "Magneto",      "bad",   "male",            "Marvel",
+     "Storm",     "good", "female",            "Marvel",
+  "Mystique",      "bad", "female",            "Marvel",
+    "Batman",     "good",   "male",                "DC",
+     "Joker",      "bad",   "male",                "DC",
+  "Catwoman",      "bad", "female",                "DC",
+   "Hellboy",     "good",   "male", "Dark Horse Comics"
+  )
+
+publishers <- tibble::tribble(
+  ~publisher, ~yr_founded,
+        "DC",       1934L,
+    "Marvel",       1939L,
+     "Image",       1992L
+  )
+
+superheroes
+publishers
+```
+
+There are two different data sets, i.e., superheroes and publishers. By using these two data set, we can obtain a data set which is the combination of the superheroes and publishers. To make this merge process, we need to use common data of data sets that is **publisher**. 
+
+In these examples:
+
+  x = superheroes, and y=publishers
+
+### 1. Left Join
+
+In the left join, the all rows of X are preserved and the only relevant columns of y is used.
+If there is no matching of the x values on the y table, this rows returns `NA` values.
+
+**Note that**, the logic behind the right join is same as the left join. For this reason, to prevent confusion, only one of them can be used.
+
+```{r, left join}
+left_join(superheroes, publishers, by="publisher")
+```
+
+### 2. Inner Join
+
+```{r, inner join}
+inner_join(superheroes, publishers, by="publisher")
+
+```
+
+Inner join is similar with the left join, but there is difference in the NA values. If there is an NA value in the rows, inner join does not return this rows in the merged data frame.
+
+### 3. Semi Join
+
+```{r, semi join}
+semi_join(superheroes, publishers, by="publisher")
+```
+
+This function provide the merged of the data sets but, it does not include the NA value of the X data set, it removes this data and moreover,semi join function does not show column of the y, publisher, data set.
+
+
+### 4. Full Join
+
+```{r, Full Join}
+full_join(superheroes, publishers, by = "publisher")
+```
+
+Full join, merged all data of the superheroes and publishers. For this reason, we can see more NA values in the merged data frame. 
+
+
+### 5. Anti Join
+
+```{r, anti join for superheroes}
+anti_join(superheroes, publishers, by = "publisher")
+```
+
+By using anti join function, we can obtain values, which have no matching in the second data frame.. In this example, Dark Horse Comics does not take part in the publishers data set, it is not macth. 
+
+
+```{r anti join for publishers}
+anti_join(publishers, superheroes, by="publisher")
+```
+
+In the second anti join function, we use publishers as x values. For this reason, the function shows that the value which does not take part in the y data set, i.e., superheroes in this trial.
