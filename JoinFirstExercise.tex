@@ -1,0 +1,362 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Join First Exercises},
+  pdfauthor={Ebru Gecici},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Join First Exercises}
+\author{Ebru Gecici}
+\date{25 08 2020}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+To get information about the \texttt{join()} function, which belongs to
+\texttt{tidyverse} package, this exercises are made by using
+\href{https://stat545.com/join-cheatsheet.html}{tutorial}.
+
+There are some join functions:
+
+\begin{itemize}
+\item
+  \texttt{left\_join()} and \texttt{right\_join()}
+\item
+  \texttt{inner\_join()}
+\item
+  \texttt{semi\_join()}
+\item
+  \texttt{full\_join()}
+\item
+  \texttt{anti\_join()}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse) }\CommentTok{\#\# dplyr provides the join functions}
+\KeywordTok{library}\NormalTok{(tinytex)}
+
+\NormalTok{superheroes \textless{}{-}}\StringTok{ }\NormalTok{tibble}\OperatorTok{::}\KeywordTok{tribble}\NormalTok{(}
+       \OperatorTok{\textasciitilde{}}\NormalTok{name, }\OperatorTok{\textasciitilde{}}\NormalTok{alignment,  }\OperatorTok{\textasciitilde{}}\NormalTok{gender,          }\OperatorTok{\textasciitilde{}}\NormalTok{publisher,}
+   \StringTok{"Magneto"}\NormalTok{,      }\StringTok{"bad"}\NormalTok{,   }\StringTok{"male"}\NormalTok{,            }\StringTok{"Marvel"}\NormalTok{,}
+     \StringTok{"Storm"}\NormalTok{,     }\StringTok{"good"}\NormalTok{, }\StringTok{"female"}\NormalTok{,            }\StringTok{"Marvel"}\NormalTok{,}
+  \StringTok{"Mystique"}\NormalTok{,      }\StringTok{"bad"}\NormalTok{, }\StringTok{"female"}\NormalTok{,            }\StringTok{"Marvel"}\NormalTok{,}
+    \StringTok{"Batman"}\NormalTok{,     }\StringTok{"good"}\NormalTok{,   }\StringTok{"male"}\NormalTok{,                }\StringTok{"DC"}\NormalTok{,}
+     \StringTok{"Joker"}\NormalTok{,      }\StringTok{"bad"}\NormalTok{,   }\StringTok{"male"}\NormalTok{,                }\StringTok{"DC"}\NormalTok{,}
+  \StringTok{"Catwoman"}\NormalTok{,      }\StringTok{"bad"}\NormalTok{, }\StringTok{"female"}\NormalTok{,                }\StringTok{"DC"}\NormalTok{,}
+   \StringTok{"Hellboy"}\NormalTok{,     }\StringTok{"good"}\NormalTok{,   }\StringTok{"male"}\NormalTok{, }\StringTok{"Dark Horse Comics"}
+\NormalTok{  )}
+
+\NormalTok{publishers \textless{}{-}}\StringTok{ }\NormalTok{tibble}\OperatorTok{::}\KeywordTok{tribble}\NormalTok{(}
+  \OperatorTok{\textasciitilde{}}\NormalTok{publisher, }\OperatorTok{\textasciitilde{}}\NormalTok{yr\_founded,}
+        \StringTok{"DC"}\NormalTok{,       1934L,}
+    \StringTok{"Marvel"}\NormalTok{,       1939L,}
+     \StringTok{"Image"}\NormalTok{,       1992L}
+\NormalTok{  )}
+
+\NormalTok{superheroes}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 4
+##   name     alignment gender publisher        
+##   <chr>    <chr>     <chr>  <chr>            
+## 1 Magneto  bad       male   Marvel           
+## 2 Storm    good      female Marvel           
+## 3 Mystique bad       female Marvel           
+## 4 Batman   good      male   DC               
+## 5 Joker    bad       male   DC               
+## 6 Catwoman bad       female DC               
+## 7 Hellboy  good      male   Dark Horse Comics
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{publishers}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 3 x 2
+##   publisher yr_founded
+##   <chr>          <int>
+## 1 DC              1934
+## 2 Marvel          1939
+## 3 Image           1992
+\end{verbatim}
+
+There are two different data sets, i.e., superheroes and publishers. By
+using these two data set, we can obtain a data set which is the
+combination of the superheroes and publishers. To make this merge
+process, we need to use common data of data sets that is
+\textbf{publisher}.
+
+In these examples:
+
+x = superheroes, and y=publishers
+
+\hypertarget{left-join}{%
+\subsubsection{1. Left Join}\label{left-join}}
+
+In the left join, the all rows of X are preserved and the only relevant
+columns of y is used. If there is no matching of the x values on the y
+table, this rows returns \texttt{NA} values.
+
+\texttt{Left\ Join:\ All\ rows\ of\ X\ are\ preserved,\ only\ relevant\ rows\ Y\ and\ multiply\ rows\ if\ there\ are\ matching.}
+
+\textbf{Note that}, the logic behind the right join is same as the left
+join. For this reason, to prevent confusion, only one of them can be
+used.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{left\_join}\NormalTok{(superheroes, publishers, }\DataTypeTok{by=}\StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 5
+##   name     alignment gender publisher         yr_founded
+##   <chr>    <chr>     <chr>  <chr>                  <int>
+## 1 Magneto  bad       male   Marvel                  1939
+## 2 Storm    good      female Marvel                  1939
+## 3 Mystique bad       female Marvel                  1939
+## 4 Batman   good      male   DC                      1934
+## 5 Joker    bad       male   DC                      1934
+## 6 Catwoman bad       female DC                      1934
+## 7 Hellboy  good      male   Dark Horse Comics         NA
+\end{verbatim}
+
+\hypertarget{inner-join}{%
+\subsubsection{2. Inner Join}\label{inner-join}}
+
+\texttt{Inner\ Join:\ Only\ rows\ with\ common\ value\ are\ returned\ and\ rws\ rae\ multiplied\ if\ there\ are\ multiple\ matchings}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{inner\_join}\NormalTok{(superheroes, publishers, }\DataTypeTok{by=}\StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 5
+##   name     alignment gender publisher yr_founded
+##   <chr>    <chr>     <chr>  <chr>          <int>
+## 1 Magneto  bad       male   Marvel          1939
+## 2 Storm    good      female Marvel          1939
+## 3 Mystique bad       female Marvel          1939
+## 4 Batman   good      male   DC              1934
+## 5 Joker    bad       male   DC              1934
+## 6 Catwoman bad       female DC              1934
+\end{verbatim}
+
+Inner join is similar with the left join, but there is difference in the
+NA values. If there is an NA value in the rows, inner join does not
+return this rows in the merged data frame.
+
+\hypertarget{semi-join}{%
+\subsubsection{3. Semi Join}\label{semi-join}}
+
+\texttt{Semi\ Join:\ Very\ similar\ to\ inner\ join\ but\ without\ columns\ from\ Y}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{semi\_join}\NormalTok{(superheroes, publishers, }\DataTypeTok{by=}\StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 4
+##   name     alignment gender publisher
+##   <chr>    <chr>     <chr>  <chr>    
+## 1 Magneto  bad       male   Marvel   
+## 2 Storm    good      female Marvel   
+## 3 Mystique bad       female Marvel   
+## 4 Batman   good      male   DC       
+## 5 Joker    bad       male   DC       
+## 6 Catwoman bad       female DC
+\end{verbatim}
+
+This function provide the merged of the data sets but, it does not
+include the NA value of the X data set, it removes this data and
+moreover,semi join function does not show column of the y, publisher,
+data set.
+
+\hypertarget{full-join}{%
+\subsubsection{4. Full Join}\label{full-join}}
+
+\texttt{Full\ join\ returns\ all\ rows\ and\ columns\ from\ both\ X\ and\ Y\ and\ both\ multiple\ mathcings\ and\ compensates\ for\ missing}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{full\_join}\NormalTok{(superheroes, publishers, }\DataTypeTok{by =} \StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 8 x 5
+##   name     alignment gender publisher         yr_founded
+##   <chr>    <chr>     <chr>  <chr>                  <int>
+## 1 Magneto  bad       male   Marvel                  1939
+## 2 Storm    good      female Marvel                  1939
+## 3 Mystique bad       female Marvel                  1939
+## 4 Batman   good      male   DC                      1934
+## 5 Joker    bad       male   DC                      1934
+## 6 Catwoman bad       female DC                      1934
+## 7 Hellboy  good      male   Dark Horse Comics         NA
+## 8 <NA>     <NA>      <NA>   Image                   1992
+\end{verbatim}
+
+Full join, merged all data of the superheroes and publishers. For this
+reason, we can see more NA values in the merged data frame.
+
+\hypertarget{anti-join}{%
+\subsubsection{5. Anti Join}\label{anti-join}}
+
+\texttt{Anti\ join\ returns\ all\ rows\ from\ X\ which\ do\ not\ have\ information\ (based\ on\ key\ column)\ in\ Y\ and\ returns\ only\ columns\ from\ X.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{anti\_join}\NormalTok{(superheroes, publishers, }\DataTypeTok{by =} \StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 4
+##   name    alignment gender publisher        
+##   <chr>   <chr>     <chr>  <chr>            
+## 1 Hellboy good      male   Dark Horse Comics
+\end{verbatim}
+
+By using anti join function, we can obtain values, which have no
+matching in the second data frame.. In this example, Dark Horse Comics
+does not take part in the publishers data set, it is not macth.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{anti\_join}\NormalTok{(publishers, superheroes, }\DataTypeTok{by=}\StringTok{"publisher"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 2
+##   publisher yr_founded
+##   <chr>          <int>
+## 1 Image           1992
+\end{verbatim}
+
+In the second anti join function, we use publishers as x values. For
+this reason, the function shows that the value which does not take part
+in the y data set, i.e., superheroes in this trial.
+
+\hypertarget{reference}{%
+\subsubsection{6. Reference}\label{reference}}
+
+This examples are made according to the information in the IE48A class
+and also the data used from the study of
+\href{https://stat545.com/join-cheatsheet.html}{Stat545}.
+
+\end{document}

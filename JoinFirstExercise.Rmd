@@ -2,10 +2,13 @@
 title: "Join First Exercises"
 author: "Ebru Gecici"
 date: "25 08 2020"
-output: 
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
     toc_depth: 3
 ---
 
@@ -28,6 +31,7 @@ There are some join functions:
 
 ```{r, data set, message = FALSE}
 library(tidyverse) ## dplyr provides the join functions
+library(tinytex)
 
 superheroes <- tibble::tribble(
        ~name, ~alignment,  ~gender,          ~publisher,

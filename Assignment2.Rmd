@@ -3,9 +3,25 @@ title: "Assignment 2"
 author: "Ebru Gecici"
 date: "16/08/2020"
 output:
+  html_document: 
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
   word_document: default
-  html_document: default
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
+<style>
+body{
+  color: #708090 ;
+  font-family: Calibri Light;
+  background-color: #F5F5F5;
+}
+</style>
+
 This report includes implementation of the **dplyr()** function and **ggplot()** function by using EPIAS 01-31 July 2020 data. To make analysis, first the data is rearranged to analyze and then required calculations are made to get meaningful outputs. By using this outputs, interpretation can be made for July 2020.
 
 More detailed from different time frame can be found in the [EPIAS](https://rapor.epias.com.tr/rapor/xhtml/ptfSmfListeleme.xhtml). 
@@ -14,8 +30,8 @@ More detailed from different time frame can be found in the [EPIAS](https://rapo
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Implementation of the dplyr() and ggplot()
-## EPIAS Electricty Report
+## IMPLEMENTATION OF THE `dplyr()` and `ggplot()` 
+## EPIAS ELECTRICTY REPORT
 
 Electricity market provide transparency, competition and  integration with other electricity markets. Main purpose of this system is to provide stronger achievement in the dynamic system [(1)](https://www.epias.com.tr/en/day-ahead-market/introduction/). For this reason, to provide more information and obtain better prediction about the future energy market, there are available data sets. By analyzing this data, balanced energy market can be achieved. The balanced electricity market means that the produced and consumed energy are in the same level. That is, you produce electricity that you needs. As the price of the electricity in huge amounts, especially in this technology era, this is more important.
 
@@ -408,7 +424,7 @@ raw_df %>%
 
 The results show that the highest difference between the daily average value of the MCP and daily average value of the SMP is observed in the eighth day.
 
-### 3. Posivite and Negative Imbalance Price
+### 3. POSITIVE AND NEGATIVE IMBALANCE
 
 #### 3.1. Negative and positive inbalance price in first day
 
@@ -474,8 +490,10 @@ raw_df%>%
     theme_minimal()
 ```
 
-Point data graph shows that, negative imbalance price and positive imbalance price concentrate in higher value. 
-#### 4. SMP Direction
+Point data graph shows that, negative imbalance price and positive imbalance price concentrate in higher value.
+
+### 4. SMP DIRECTION
+
 Another implementation for the energy usage is about SMP direction.
 
 #### 4.1. Pie chart of SMP direction
