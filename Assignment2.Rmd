@@ -290,7 +290,12 @@ raw_df%>%
     geom_line(aes(y = Average_SMP, color = "Average daily SMP")) +
     geom_line(aes(y = Min_SMP, color = "Minimum daily SMP")) +
     geom_line(aes(y = Max_SMP, color = "Maximum daily SMP")) +
-    theme_minimal()
+    theme_minimal() +
+    labs(title = "Minimum, Maximum and Average Price of Daily SMP",
+         subtitle = "EPIAS 01-31 July 2020",
+         x= "Days",
+         y= "Prices",
+         color = "Prices")
 ```
 
 #### 2.2.3 Weekly change of the SMP 
@@ -318,7 +323,12 @@ raw_df%>%
     geom_line(aes(y = Average_SMP, color = "Average weekly SMP")) +
     geom_line(aes(y = Min_SMP, color = "Minimum weekly SMP")) +
     geom_line(aes(y = Max_SMP, color = "Maximum weekly SMP")) +
-    theme_minimal()
+    theme_minimal() +
+    labs(title = "Minimum, Maximum and Average Price of Weekly SMP",
+         subtitle = "EPIAS 01-31 July 2020",
+         x="Weeks",
+         y="Price",
+         color = "Prices")
 ```
 
 
@@ -355,7 +365,12 @@ raw_df %>%
   ggplot(aes(x = Day)) +
     geom_line(aes(y = Daily_MCP, color = "Daily Average MCP")) +
     geom_line(aes(y = Daily_SMP, color = "Daily Average SMP")) +
-    theme_minimal()
+    theme_minimal() +
+    labs(title = "Comparison of daily SMP and MCP",
+         subtitle = "EPIAS 01-31 July 2020",
+         x="Days",
+         y="Price",
+         color="Price Type")
 ```
 
 #### 2.3.3. The weekly relationship between MCP and SMP
@@ -384,7 +399,13 @@ raw_df %>%
             Difference = abs(mean(MCP) - mean(SMP))) %>%
 
   ggplot(aes(x = Week, y = Difference, fill = "Weeks")) +
-    geom_bar(stat = "identity")
+    geom_bar(stat = "identity") +
+    theme_minimal()+
+    theme(legend.position = "none") +
+    labs(title = "Difference Between Weekly MCP and SMP ",
+         subtitle = "EPIAS 01-31 July 2020",
+         x = "Week",
+         y = "Average Price Difference")
 ```
 
 #### 2.3.5. Graph of the daily relationship between MCP and SMP
@@ -401,7 +422,8 @@ raw_df %>%
     geom_line(aes(y=Daily_SMP, color = "Daily SMP")) +
     labs(x = "Day", y = "TL/MWh",
        title = "Daily MCP-SMP Change Graph",
-       subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
+       subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ",
+       color = "Price Type")+
   theme_minimal()
 ```
 
@@ -419,7 +441,8 @@ raw_df %>%
     labs(x = "Day", y = "TL/MWh",
        title = "Difference between Daily average MCP-SMP Change Graph",
        subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
 The results show that the highest difference between the daily average value of the MCP and daily average value of the SMP is observed in the eighth day.
@@ -440,7 +463,8 @@ raw_df %>%
     geom_line(aes(y=NegativeIP, color = "Negative imbalance price")) +
     labs(x = "Hours", y = "TL/MWh",
          title= "Pozitive and Negative Imbalance Price of First Day",
-         subtitle = "EPIAS July 01, 2020") +
+         subtitle = "EPIAS July 01, 2020",
+         color = "Imbalance Price") +
     theme_minimal()
 ```
 
@@ -458,7 +482,8 @@ raw_df %>%
     geom_line(aes(y=NegativeIP, color = "Negative imbalance price")) +
     labs(x = "Hours", y = "TL/MWh",
          title= "Pozitive and Negative Imbalance Price of Last Day",
-         subtitle = "EPIAS July 31, 2020") +
+         subtitle = "EPIAS July 31, 2020",
+         color = "Imbalance Price") +
     theme_minimal()
   
   
@@ -486,7 +511,9 @@ raw_df%>%
       geom_point() +  
       labs(x ="Negative Imbalance Price", 
            y ="Positive Imbalance Price",  
-           title="Negative Imbalance and Positive Imbalance Prices") +
+           title="Negative Imbalance and Positive Imbalance Prices",
+           color = "Date",
+           size = "Negative Imbalance Price") +
     theme_minimal()
 ```
 
@@ -504,7 +531,11 @@ raw_df %>%
   transmute(EnergyUsage = ifelse(SMPDirection == "?Energy Surplus", "Surplus", "Deficit")) %>%
   ggplot(aes(x = "", y=EnergyUsage, fill=EnergyUsage)) +
     geom_bar(stat = "identity", width = 1) +
-    coord_polar("y")
+    coord_polar("y") +
+    theme_minimal() +
+    labs(title = "Energy Usage Analysis",
+         subtitle = "EPIAS 01-31 July 2020",
+         fill = "Energy Usage")
 
 ```
 
@@ -537,7 +568,12 @@ raw_df %>%
   
   ggplot(aes(x = Hours, y = EnergyUsageNumber, fill = EnergyUsageNumber)) +
     geom_bar(stat = "identity") +
-    theme_minimal()
+    theme_minimal() +
+    labs(title = "The deficit Energy Usage According to the Hours",
+         subtitle = "EPIAS 01-31 July 2020",
+         fill = "Number of Energy Usage",
+         x="Hours",
+         y = "Count")
 
 ```
 
@@ -587,8 +623,9 @@ raw_df %>%
     
   labs(x = "Hour",
        y = "Numbers",
-       title = "Number of surplus, deficit, and balance",
-       subtitle = "EPIAS July 2020") +
+       title = "Number of Surplus, Deficit, and Balance",
+       subtitle = "EPIAS July 2020",
+       color = "SMP Distribution Type") +
   theme_minimal()
 ```
 
