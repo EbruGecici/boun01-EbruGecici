@@ -30,6 +30,7 @@ data frames in the tennis data:
 - tourney_df
 - rank_df
 
+Variables of the dataset
 
 ```{r}
 player %>% glimpse()
