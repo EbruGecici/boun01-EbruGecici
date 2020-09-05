@@ -44,7 +44,7 @@ In the group project, we analyze the 2020 online car market Turkey by using [kag
 
 - Proposal: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Proposal.html)
 - Data Preprocessing: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Preprocessing.html)
-- Exploratory Data Analysis: 
+- Exploratory Data Analysis: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/ExploratoryDataAnalysis.html)
 - Shiny App:
 - Final Report: 
 
