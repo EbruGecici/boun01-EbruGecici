@@ -27,7 +27,7 @@ This report includes implementation of the **dplyr()** function and **ggplot()**
 More detailed from different time frame can be found in the [EPIAS](https://rapor.epias.com.tr/rapor/xhtml/ptfSmfListeleme.xhtml). 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE ,fig.align = "center")
 ```
 
 ## IMPLEMENTATION OF THE `dplyr()` and `ggplot()` 
@@ -156,7 +156,10 @@ raw_df%>%
     geom_line(aes(y = MaxMCP_Hour, color = "Maximum hourly MCP"))+
     #give a name to the graph
     labs( title = "Minimum and Maximum Hourly MCP Values",
-          subtitle = "EPIAS JULY 2020")+
+          subtitle = "EPIAS JULY 2020",
+          color = "MCP",
+          x = "Hours",
+          y = " MCP Values")+
     #type of the graph, these function provide white canvas 
     theme_minimal()
 
@@ -182,7 +185,8 @@ ggplot(plot1, aes(x = Hours)) +
   labs(x = "Hour", y = "Hourly Average MCP (TL/MWh)",
        title = "Hourly Market Clearing Price - MPC",
        subtitle = "Energy Exchange of Turkey - EXIST/EPIAS, between July 01 and July 31 ")+
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
 In addition to the hourly analysis of the MCP, we can also make these calculations for each day. For this purpose, first we define minimum and maximum value of each day, and then we calculate average value of the daily MCP value. Finally, by using visualization tools, the outputs can be analyzed. 
@@ -214,7 +218,8 @@ raw_df %>%
     labs(x = "Week",
          y = "TL/MWh",
          title = "Extreme values of the MCP",
-         subtitle = "EPIAS 01-31 July 2020") +
+         subtitle = "EPIAS 01-31 July 2020",
+         color = "MCP") +
     theme_minimal()
 ```
 
@@ -243,7 +248,8 @@ raw_df %>%
     labs(x = "Day",
          y = "TL/MWh",
          title = "Minimum and Maximum value of the MCP",
-         subtitle = "EPIAS 01-31 July 2020") +
+         subtitle = "EPIAS 01-31 July 2020",
+         color = "MCP") +
     theme_minimal()
 ```
 
