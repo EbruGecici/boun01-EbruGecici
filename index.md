@@ -26,7 +26,7 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
 ### Assignment
 
-In the first assignment by using [airbnb data](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data), we prepare exploratory data analysis (EDA) to understand data. For this,  we prepare
+In the first assignment by using [airbnb data](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data), we prepare exploratory data analysis (EDA) to understand data. For this purpose, we prepare
 
 - Report: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb.html)/[pdf](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb.pdf)
 - Shiny App: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb_Shiny.html)
