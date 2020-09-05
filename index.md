@@ -22,7 +22,7 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
 
 ### **Group Assignments and Projects**
-#### [Data Mine'R's (R'ým Balým Peteðim)](https://pjournal.github.io/boun01g-data-mine-r-s/)
+#### [Data Mine'R's](https://pjournal.github.io/boun01g-data-mine-r-s/)
 
 ### Assignment
 
