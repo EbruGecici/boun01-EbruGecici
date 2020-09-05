@@ -4,7 +4,7 @@
 
 ### **Assignments**
 
-### Week 1 - Assignment 1: *R Markdown*
+### Assignment 1: *R Markdown*
 
 
 The R Markdown assignment consists of the creating a new R Markdown file and analysing of some blogs, pages, and videos, which are related to **R**.
@@ -13,7 +13,7 @@ The information in the assignment 1 is related to Covid-19 and R combination. In
 - [R Markdown](Introduction.html)
 
 
-### Week 2 - Assignment 2: *Electricty Market Price*
+### Assignment 2: *Electricty Market Price*
 
 The second assignment is related to implementation and practise of the dplyr() function and ggplot() function.
 By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
@@ -21,11 +21,25 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 - [dplyr() and ggplot()](Assignment2.html)
 
 
+### **Group Assignments and Projects**
+#### [Data Mine'R's (R'ým Balým Peteðim)](https://pjournal.github.io/boun01g-data-mine-r-s/)
+
+### Assignment
+
+In the first assignment by using [airbnb data](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data), we prepare exploratory data analysis (EDA) to understand data. For this,  we prepare
+
+- Report: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb.html)/[pdf](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb.pdf)
+- Shiny App: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Assignment/Airbnb_Shiny.html)
+
+### Project
+
+### Bonus: *data.table*
+
 ### **Exercises**
 
 ### Week 3
 
-In this exercise, there is a basic shiny app implementation can be found. In this example Movies are used to create inteactive ggplot application by using shiny() package..
+In this exercise, there is a basic shiny app implementation can be found. In this example Movies are used to create inteactive ggplot application by using shiny() package.
 
 - [Shiny App - Movie Example](ShinyExample.html)
 
