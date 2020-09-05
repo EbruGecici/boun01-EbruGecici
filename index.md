@@ -33,7 +33,17 @@ In the first assignment by using [airbnb data](https://www.kaggle.com/dgomonov/n
 
 ### Project
 
+In the group project, we analyze the 2020 online car market Turkey by using [kaggle](https://www.kaggle.com/alpertemel/turkey-car-market-2020) data set. The aim of this study is that (i) to provide exploratory analysis by using `dplyr`, `tidyverse`, etc. and (ii) to create a model for predicting of the car data. Hence, first we prepare a proposal, then we make an EDA report and shiny app. Lastly, we present a model to obtain final report of the project. You can reach our report by using following links:
+
+- Proposal: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Proposal.html)
+- Data Preprocessing: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Preprocessing.html)
+- Exploratory Data Analysis: 
+- Shiny App:
+- Final Report: 
+
 ### Bonus: *data.table*
+
+For bonus projcet, we choose [data.table](https://cran.r-project.org/web/packages/data.table/index.html). In this project, first we create a tutorial to explain this package and record a video to show information which we learn. 
 
 ### **Exercises**
 
@@ -48,3 +58,8 @@ In this exercise, there is a basic shiny app implementation can be found. In thi
 **Exercise 1**: The trial of the implementation of the join function. In this example, the course examples are re-maded to understand the logic of the `join()` function. You can also reach these examples in course page. 
 
 - [Join First Trial](JoinFirstExercise.html)
+
+
+### References and Useful Tutorials
+
+[Lecture Notes](https://boun-ie48a.github.io/)
