@@ -1186,7 +1186,7 @@ Moreover, by using *unsupervised* and *supervised* techniques, we create classif
 
 # References
 
-1. Related Notebooks in the Kaggle
+1. Related Notebooks
 
 [Kaggle Notebook1 - Predicting Diamond Prices with Linear Regression](https://www.kaggle.com/datasciencecat/predicting-diamond-prices-with-linear-regression)<br>
 [Kaggle Notebook2 - Diamond Exploration Price Modeling](https://www.kaggle.com/abhishekheads/diamond-exploration-price-modeling)<br>
