@@ -1,7 +1,7 @@
 ---
 title: "Diamond Price Estimation"
 author: "Ebru Gecici"
-date: "06 09 2020"
+date: "06/09/2020"
 output: 
   html_document:
     number_sections: true
@@ -26,12 +26,10 @@ body{
 }
 </style>
 
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.align = "center", message=FALSE, warning=FALSE)
-st = "Diamond Dataset from ggplot2" 
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", message=FALSE, warning=FALSE, error = FALSE)
+st = "Diamond Dataset" 
 ```
-
 
 # Diamonds
 
@@ -58,7 +56,6 @@ Figure 1. Color classification of the diamonds
 
 </center>
 
-
 - **Clarity**: Clarity defines the extent or degree of imperfections that are present in a diamond.There is 11 point diamond clarity scale that is creating by Gemologist Institute of America or GIA. his scale starts from flawless point and ends at prominent inclusions. Flawless means a diamond with no inclusion. This diamond is extremely rare.
 
 <center>
@@ -80,7 +77,6 @@ Figure 3. Quality of Cut
 
 </center>
 
-
 # Data and Required Packages
 
 ## Data Information
@@ -94,30 +90,33 @@ To fulfill these objectives, (i) data is analyzed and prepared for creating pred
 
 *Note that this packages are used to prepare EDA, if more packages are required, they are installed and loaded when they are required.*
 
-```{r, required packages}
+```{r required packages}
 library(tidyverse) # used for data analyses
 #as the tidyverse includes ggplot2 and dplyr packages, we do not need to add these packages additionally.
-library(ggplot2) # for visualization
-library(dplyr)   # to make calculations 
+  # library(ggplot2) # for visualization
+  # library(dplyr)   # to make calculations 
 library(tm) # provides a set of predefined sources
 library(knitr) # to provide report creation
-library(kableExtra) # to provide arrangement of the tables
+library(kableExtra)  # to provide arrangement of the tables
+library(patchwork)   # for combine plots in one lines
+library(data.table)  # for easy implementation of some loops and functions
+library(rpart)
+library(rpart.plot)
+library(caret)
+library(e1071)
+library(rattle)
+library(corrplot)    # to get correlation plot 
 ```
 
-The dataset in this analysis is obtained from the `ggplot2` packages. Before the load this data set. By using `?diamonds` we can obtain information about this dataset. This data set contains more than 50.000 round cut diamonds, whose features like are located in this data set. There are 53940 rows and 10 variables. By using this `glimpse()` function, we obtain these variables.
-
-```{r, eval=FALSE}
-#while we load ggplot2 package, we get directly diamonds dataset by following line
-#we assign our data set to diamonds for more easy use
-diamonds <- diamonds 
-```
+The dataset in this analysis is obtained from the `ggplot2` packages. Before the load this data set, by using `?diamonds` we can obtain information about this dataset. This data set contains more than 50.000 round cut diamonds, whose features like are located in this data set. There are `nrow(diamonds)` rows and `ncol(diamonds)` variables. By using this `glimpse()` function, we obtain these variables.
 
 ```{r}
 #variables of the dataset
 diamonds %>%
   glimpse()
 ```
-Moreover same results can be obtained by using  `str()` function which comes from the Base R.
+
+Like `glimpse()` function, we can also get similar results by using structure function which is the function of Base R, i.e., `str()`. 
 
 ```{r}
 diamonds %>%
@@ -130,6 +129,8 @@ Since we check the order of the variables of color categorical variable, there i
 diamonds$color <- factor(diamonds$color, levels = c("J", "I", "H", "G", "F", "E", "D"))
 ```
 
+According to the above code, we define new levels, in other words we rearranged correctly.Thus, from the `glimpse()` and `str()` functions and explanation of the dataset, we obtain following variables and their definition.
+
 **Price**: price in US dollars (\$326–\$18,823)<br>
 **Carat**: weight of the diamond (0.2–5.01)<br>
 **Cut**: quality of the cut (Fair, Good, Very Good, Premium, Ideal)<br>
@@ -141,22 +142,32 @@ diamonds$color <- factor(diamonds$color, levels = c("J", "I", "H", "G", "F", "E"
 **Depth**: total depth percentage = z / mean(x, y) = 2 * z / (x + y) (43–79)<br>
 **Table**: width of top of diamond relative to widest point (43–95)<br>
 
+As we know the data, we can make EDA and create a prediction model. However, we need to check the dataset whether it has pre-processing or not. For thi purpose, the following section is used as data pre-processing.
+
 ## Data Preprocessing
 
-In the previous section, detailed information about investigated dataset is presented. In this section, the data is analyzed/pre-processed before the EDA and creating estimation model.
+In the previous section, detailed information about investigated dataset is presented. To make pre processing, basic examinations will be made.Some of them are
+
+- NA values,
+- Duplicated values,
+- Control of the variables (as the depth formulation is given, we control variables which take place in this formulation)
+- Controlling of the outliers.
+
+Moreover, the level control is made in the previous section by using `str()` and it is determined that the level of the color is wrong. Then, by using `factor()` function  and its property `level`, the correct order is defined for the color. 
 
 ```{r}
 #to control NA values in the dataset
 sum(any(is.na(diamonds)))
 ```
 
-By checking the dataset, we can control NA values. In this data set, there is `r sum(any(is.na(diamonds)))` NA value. This means that there is no missing value in any row or column.
+By using above function we can obtain number of NA values in this dataset. When we check the dataset, there is `r sum(any(is.na(diamonds)))` NA value. This means that there is no missing value in any row or column.
 
 ```{r}
 sum(as.numeric(duplicated(diamonds)))
 ```
 
-By using above function we can obtain number of NA values in this dataset. Another important control point is that checking of the duplicated values. There are `r sum(as.numeric(duplicated(diamonds)))` duplicated lines. Before the analysis, we need to  extract these data from the data frame. Because these duplicated values can manipulate our analysis, for example one of the duplicated value go to train data set, the other one can be in the test data. As a result, the same value become in both data set and this can prevent the good prediction. For this reason, duplicated values should be removed fromthe data set. This process can be made by using various function, i.e., `duplicated()`, `unique()`, and `distinct()`. In this assignment, the *`unique()`* function is used.
+Another important control point is that checking of the duplicated values. There are `r sum(as.numeric(duplicated(diamonds)))` duplicated lines. Before the analysis, we need to  extract these data from the data frame. Because these duplicated values can manipulate our analysis, for example one of the duplicated value go to train data set, the other one can be in the test data. As a result, the same value become in both data set and this can prevent the good prediction. For this reason, duplicated values should be removed from the data set. This process can be made by using various function, i.e., `duplicated()`, `unique()`, and `distinct()`. In this assignment, the *`unique()`* function is used.
+
 
 ```{r}
 #taking only unique rows form the data set
@@ -175,7 +186,7 @@ head(diamonds) #first 6 rows of the data
 
 ## Accuracy of the Values
 
-We can control the negative price values in the data set.
+The negative price values in the data set can be control.
 
 ```{r}
 diamonds %>%
@@ -191,170 +202,185 @@ The calculation is that
 total depth percentage = z / mean(x, y) <br>
                        = 2 * z / (x + y)
 
-According to the this calculation, the depth variable and x,y,z variables are compared and outliers or manipulated data can be removed. For this purpose following calculations and visualizations are made.
-
-```{r, fig.align=75%}
-#by using ggplot function, we can realize the relationship between x and y.
-#it is expected that there linear relationship between these two variable. 
-diamonds %>%
-  ggplot(., aes(x = x, y = y)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", color = "red") + # provide adding smooth line for data
-  theme_minimal() +
-  labs(title = "Comparison of the x and y variable",
-       x = "X variable",
-       y = "Y variable")
-```
-
-Although there are a few outliers, the most of the data shows that there is a linear relationship between x and y variables.
-Same analysis can be made with other variables:
-
+According to the this calculation, the depth variable and x,y,z variables are compared and outliers or manipulated data can be removed. For this purpose following calculations and visualizations are made. Thus, we can control negativity of the x,y, and z variables.
 
 ```{r}
 diamonds %>%
-  ggplot(., aes(x = z, y = y)) + #comparison of the z and y variables
-  geom_point() + 
-  geom_smooth(method = "lm", color = "red")+ # provide adding smooth line for data
-  theme_minimal() +
-  labs(title = "Comparison of the x and y variable",
-       x = "Z variable",
-       y = "Y variable")
+  filter(x <= 0 & y > 0 & z > 0) # provide to find x variables which is smaller than equal to zero whereas the x and y is greater than zero
+diamonds %>%
+  filter(y <= 0 & x > 0 & z > 0) # provide to find y variables which is smaller than equal to zero whereas the x and y is greater than zero
+diamonds %>%
+  filter(z <= 0 & x > 0 & y > 0) # provide to find z variables which is smaller than equal to zero whereas the x and y is greater than zero
 ```
 
-There are also outliers but still the linear relationship can be found between z and y variables.
-According to the this analysis, we can say that linear relationship can be obtained between x and z variables.
-
-Another accuracy control about finding the correcting entering variable is that to find the zero values of the x,y, and z variables. As mentioned before, we can find depth variable by using given formulation. By using this formulation, we can detect the wrong entered variables. Before this examination, we can check the zero values:
-
-```{r}
-diamonds %>%
-  filter(x == 0 & y != 0 & z !=0) # provide to find x variables which is zero whereas the y and z is greater than zero
-
-diamonds %>%
-  filter(y == 0 & x != 0 & z !=0) # provide to find y variables which is zero whereas the x and z is greater than zero
-
-diamonds %>%
-  filter(z == 0 & x != 0 & y !=0) # provide to find z variables which is zero whereas the x and y is greater than zero
-```
-
-Results show that, there is no value which has x=0 and the y and z are greater than zero. Like this calculations, same filtration can be used other two variables. 
-
-Only z variable has missing value when the x and y have values. For this reason by using depth formulation we can fill the missing value of the z. 
+All `x` and `y` values are positive, for now we don't need to do anything. But, there are some missing values in the x,y, and z columns, to detect these values, we can use following codes. When we find the missing values, by using *depth* formulation we can fill some lines.
 
 ```{r}
 diamonds = diamonds %>%
-  mutate(z = ifelse(z == 0 & x != 0 & y != 0,round(depth * mean(c(x, y)) / 100, 2), z))
-
-#re-control of the z missing values.
-diamonds %>%
-  filter(z == 0 & x != 0 & y !=0) # provide to find z variables which is zero whereas the x and y is 
+  mutate(z = ifelse(z == 0 & x != 0 & y != 0,round(depth * mean(c(x, y)) / 100, 2), z)) 
 ```
 
-If the two of them are missing, we cannot control the acuracy of the data. For this reason, we need to remove this data from the dataset.
+Up until now, we control the negativity of the values, and moreover we find the zero values in the z column. Then, we fulfill these lines by using formulation. However, we need to control one more thing in this data set that is whether the two of these variable are zero or not. In this situation, we do not calculate the values because there two unknown value and one formula. In this situation, we can remove these trials from the data set. For this purpose, the binary combinations are controlled with filter operation. 
 
 ```{r}
-#control of two of them.
 diamonds %>%
-  filter(x == 0 & y == 0)
-
-diamonds %>%
-  filter(x == 0 & z == 0)
-
-diamonds %>%
-  filter(y == 0 & z == 0)
+  filter(x <= 0 & y <= 0 ) 
 ```
 
-
-##### Buraya Açıklama Eklenecek!!!!!!!!!!
+When we control the data set we obtain trials which have both x and y are zero.We control other combinations.
 
 ```{r}
-diamonds = diamonds %>%
+diamonds %>%
+  filter(x <= 0 & z <= 0)
+```
+
+```{r}
+diamonds %>%
+  filter(y <= 0 & z <= 0)
+```
+
+As a result there are `r diamonds %>% filter(x <= 0 & z <= 0) %>% nrow()` rows that both x and z values are 0. As we do not calculate values of these variable, we can remove from the data set. Because this number is too small when we compare the all data set.
+
+```{r}
+#by using following code we find values which do not have negative values. 
+diamonds <- diamonds %>%
   filter(!(x == 0 & z == 0))
-
+#control of the data set according to the zero values of x, y, and z variables.
 diamonds %>%
   filter(x == 0 | y == 0 | z == 0)
 ```
 
-By using following code, we can calculate own depth variables as calculate and then we can compare to check accuracy.
+The last filter shows that, there is no zero values in the x,y, and z variables' column.Now, we can have more clear data set. But,there is one more examination about the data set which is finding outliers of the data set. For this purpose, we can control numeric variables x,y, and z with `range()` function.
 
-```{r}
-diamonds$calculate = 2 * diamonds$z / (diamonds$x + diamonds$y) * 100
+```{r, eval=FALSE}
+#In this report this code do not run because of the space. But following codes can be run and the results can be shown.
+#this codes provide the range of the data set and values in the defined column
+range(diamonds$x)  # finding of the outlier for x variable
+diamonds$x %>% 
+  unique() %>% 
+  sort(decreasing = TRUE)
+
+range(diamonds$y) # finding of the outlier for x variable
+diamonds$y %>% 
+  unique() %>% 
+  sort(decreasing = TRUE) 
 ```
 
+When we control the output of the above lines, we obtain that there is huge difference between the highest value of the y and the second highest value of the y.The reason behind this huge different, the data can be entered wrong or the calculation may be wrong. For this reason, we can remove this line or we can calculate by using depth formulation. 
 
-```{r, include false}
-#difference between minimum and maximum values
-range(diamonds$x)
-range(diamonds$y)
-sort(unique(diamonds$y), decreasing = TRUE) %>%
-  head
-
-#since there is huge difference between minimum and maximum values of y, we can find this data from the data set by using following code.
-diamonds %>%
-  filter(y > 15)
-
-#after the finding of this values,which can be wrong entered data, we can change this values by using depth and x, and z variables 
+```{r}
+#first we can try to add calculation for the outlier y variable with the following code.
 diamonds %>%
   filter(y > 15) %>%
   mutate(new_y = (2 * z / depth) / 100 - x) %>%
   select(depth, x, z, y, new_y)
 
-#finding of small values
+#when we calculate this value, we can not obtain proper value. For this reason we can remove this data from the data set.
 diamonds = diamonds %>%
   filter(y < 15)
+```
 
+Lastly, we control the z variable range.
+
+```{r, eval=FALSE}
 range(diamonds$z)
+diamonds$z %>% 
+  unique() %>% 
+  sort(decreasing = TRUE)
 ```
 
-```{r}
-# another way of finding outliers of dataset
-# visualization
+Since, we also obtain outlier trial for the z variable, we can remove or calculate new value for this trial. There are one variable, for this according to the manual calculation, the wrong entering process is detected. For this reason, instead of the removing of the line, the calculation is preferred. 
+
+```{r,include=FALSE}
 diamonds %>%
-  filter(x != 0 & y != 0 & z != 0) %>%
-  ggplot(., aes(x = calculate, y = depth)) +
-  geom_point() + 
-  geom_abline(intercept = 0, slope = 1, color="red", 
-              linetype="dashed", size=1.5) +
-  theme_minimal() +
-  labs(title = "Comparison of the depth and calculated depth",
-       x = "Calculated depth",
-       y = "Depth (given in the dataset)")
-```
-
-As the same calculation is used, we expect that the strong relationship between calculated depth and depth given in the dataset. This relationship should be in the linear line if the given data are true.
-Results show that, all of the data do not illustrate the linear relationship, there are some outliers. One of them is far from the linear smoothing line. This data should be removed from the dataset. Before the removing of the data, we check all data.
-
-```{r}
-diamonds[which.max(diamonds$calculate),]
-diamonds[abs(diamonds$x - 5) < 1 & abs(diamonds$y - 5) < 1,]
-```
-
-```{r}
-#finding outlier, this data shows the extreme point for the z variable
-diamonds %>%
-  filter(z == 31.8) %>%
+  filter(z == 31.8) %>% 
   mutate(new_z = depth * mean(c(5.12, 5.15)) / 100) %>%
   select(z, new_z)
-
-diamonds$calculate[diamonds$z == 31.8] = diamonds$calculate[diamonds$z == 31.8] / 10
-diamonds$z[diamonds$z == 31.8] = diamonds$z[diamonds$z == 31.8] / 10
 ```
 
 ```{r}
-diamonds %>%
-  filter(!(abs(calculate - depth) < 11)) %>%
-  select(calculate, depth, x, y, z)
+#changing of the outlier with the calculated value.
+diamonds$z[diamonds$z == 31.8] <- diamonds$z[diamonds$z == 31.8] / 10
+#Now, we also need to check the depth column. Then, we need to change the depth value, with the new calculated depth value.
+diamonds$calculated_depth <- 2 * diamonds$z / (diamonds$x + diamonds$y) * 100
 ```
+
+By using calculated depth, which is obtained from the x,y and z values with using formulation, and depth that is given in the dataset, we can compare the results. It is expected that, both values have linear relationship. 
+
+```{r, fig.width=6, fig.height=4}
+# diamonds[, calculate := 2 * z / (x + y)]
+diamonds %>%
+  ggplot(., aes(x = calculated_depth, y = depth)) +
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 1, color="red", size=1.5) +
+  theme_minimal() +
+  labs(title = "The Depth vs Calculated Depth",
+       x = "Calculated Depth",
+       y = "Depth (given in the dataset)")
+```
+According to the results, we can say that almost all variables have linear relationship, but some of them is not. When we analyzed the [information about the diamonds](https://www.brilliance.com/diamonds/ideal-depth-table-round-cut-diamonds#:~:text=To%20find%20the%20depth%20percentage,between%2062.9%20and%2059.5%20percent.), the difference between 56.5 and 65, whereas the ideal range is between 59.5 and 62.9. Hence, we can remove data which does not have this property. According to the web-page,the interval selected as 9. But this criteria can be changed according to the other implementations and variables.
+
+```{r}
+diamonds %>%
+  filter(!(abs(calculated_depth - depth) <9)) %>%
+  select(calculated_depth, depth, x, y, z)
+```
+
+There are `r diamonds %>% filter(!(abs(calculated_depth - depth) < 9)) %>% select(calculated_depth, depth, x, y, z) %>% nrow()` observations. When we compare it with the number of all observations in the dataset, it is very small value. So, we can remove them from the dataset.
+
+```{r}
+diamonds = diamonds %>%
+  filter((abs(calculated_depth - depth) < 9))
+diamonds = subset(diamonds, select = -c(calculated_depth))
+```
+
+According to the depth formulation and web information, for ideal diamonds, there should be relationship between variables x,y, and z. For this reason, as a final interpretation we can compare the x, y and z values with each other. 
+
+```{r}
+#by using ggplot function, we can realize the relationship between x and y.
+#it is expected that there linear relationship between these two variable. 
+p1 <- diamonds %>%
+        ggplot(., aes(x = x, y = y)) + 
+        geom_point() + 
+        geom_smooth(method = "lm", color = "red") + # provide adding smooth line for data
+        theme_minimal() +
+        labs(title = "Comparison of \n the x and y variable",
+             x = "X variable",
+             y = "Y variable")
+
+p2 <- diamonds %>%
+        ggplot(., aes(x = z, y = y)) + #comparison of the z and y variables
+        geom_point() + 
+        geom_smooth(method = "lm", color = "red")+ # provide adding smooth line for data
+        theme_minimal() +
+        labs(title = "Comparison of \n the x and y variable",
+             x = "Z variable",
+             y = "Y variable")
+
+p3 <- diamonds %>%
+        ggplot(., aes(x = x, y = z)) +
+        geom_point() + 
+        geom_smooth(method = "lm", color = "red")+
+        theme_minimal() +
+        labs(title = "Comparison of \n the x and y variable",
+             x = "Z variable",
+             y = "Y variable")
+
+(p1 | p2 | p3) #provide combination of the plots in one line
+```
+
+As we mentioned before, the relationship between variables show that there is high correlation. But, we can assume that these x, y and z values are valid values.
 
 # Exploratory Data Analysis
 
 After the pre-processing of the data, we make EDA for the `diamonds` dataset by using different variables.
 
-## Quality of Cut
+## Cut
 
-As we mentioned before, cut is one of the most important feature of diamonds. In this data set, quality of cut is given as categorical variables. Fair is the lowest quality, whereas, ideal is the highest quality. For this reason, to examine diamond dataset by using this feature, first I illustrate the number of trials grouped according to the cut feature.   
+As we mentioned before, cut is one of the most important feature of diamonds. This variable shows the quality of cut. In this data set, quality of cut is given as categorical variables. Fair is the lowest quality, whereas, ideal is the highest quality. For this reason, to examine diamond dataset by using this feature, first I illustrate the number of trials grouped according to the cut feature. 
+*Note that the color of the pie chart can be change by using `scale_fill_manual`*
 
-```{r}
+```{r,fig.width=6, fig.height=4}
 diamonds %>%
   #mutate(cut = factor(cut)) %>%
   group_by(cut) %>%
@@ -362,12 +388,13 @@ diamonds %>%
   mutate(percentage = 100*count/sum(count)) %>%
 
 ggplot(., aes(x = '', y = count, fill = cut)) + 
-  geom_bar(width = 1, stat = "identity", alpha = 0.8) +
+  geom_bar(width = 1, stat = "identity", alpha = 0.85) +
   coord_polar("y") +
   theme_void() +
-  theme(plot.title = element_text(vjust = 0.5)) +
-  geom_text(aes(label = paste(format(percentage,digits=2), "%")), size=4, color = "black", position = position_stack(vjust = 0.3)) +
-  labs(title = "Percentage of Quality of Cut ",
+  theme(plot.title = element_text(vjust = 0.5),) +
+  scale_fill_manual(values=c("seashell2", "lightpink1", "seashell3", "paleturquoise3", "paleturquoise4")) +
+  geom_text(aes(label = paste(format(percentage,digits=3), "%")), size=3, color = "black", position = position_stack(vjust = 0.3)) +
+  labs(title = "Quality of Cut Percentage ",
        subtitle = st,
        fill = "Quality of the Cut")
 ```
@@ -387,32 +414,33 @@ diamonds %>%
   kable_minimal(full_width = F)
 ```
 
-More information about cut type can be obtained by analyzing the above table. While, the pie chart presents the percentage of the dataset according to the cut type, the Above table shows the number of trial with cut type. Furthermore, the minimum, average and maximum prices are addressed in this table. Although the most popular cutting type is Ideal cut, its price is not the highest one. According to the average prices, the most expensive diamonds are belongs to Premium. 
- 
+More information about cut type can be obtained by analyzing the above table. While, the pie chart presents the percentage of the dataset according to the cut type, the Above table shows the number of trial with cut type. Furthermore, the minimum, average and maximum prices are addressed in this table. Although the most popular cutting type is Ideal cut, its price is not the highest one. According to the average prices, the most expensive diamonds are belongs to Premium if we just look for the cut variable. So, it means that we can not explain the response (price) variable only with the cut type of a diamond.
 
-## Number of Colors
+## Colors
 
-Colors are the another imporant feature of the diamonds and also it affects the price of the diamonds. For this reason, in this data set, colors are also investigated. First, according to trials, we can group according to the color. After this grouping process we can number of diamonds with this group.
+Colors are the another important feature of the diamonds and also it affects the price of the diamonds. For this reason, in this data set, colors are also examined. 
+- First, according to trials, we can group according to the color. 
+- After this grouping process we can number of diamonds with this group.
 
-```{r}
+```{r,fig.width=6, fig.height=4}
 diamonds %>%
   group_by(color)%>%
   summarise(count = n()) %>%
   
   ggplot(., aes(x=color, y = count, fill = count)) +
   geom_col() +
-  scale_fill_gradient("count", low="seashell", high="seashell4") +
+  scale_fill_gradient("count", low="paleturquoise1", high="paleturquoise4") +
   #geom_line(aes(x=color, y=count), color = "black") +
   geom_line(aes(y = count), size = 1.2, color="black", group = 1) +
   theme_minimal() +
   theme(legend.position = "none") +
-  labs(title = "Classification Of Diamonds According to the Colors",
+  labs(title = "Number of Colors in the Data",
        subtitle = st,
-       x = "Diamond Color",
+       x = "Color",
        y = "Number of Color")
 ```
 
-The bar chart illustrates that there is at most G color diamond, whereas, there is at least J color. We can obtain exact value of each color in data set by using below table.
+According to the results of the bar chart, while there is at most G color diamond, there is at least J color. To get exact value of the each color, we can use following table.
 
 ```{r}
 diamonds %>%
@@ -426,34 +454,38 @@ diamonds %>%
   kable_minimal(full_width = F)
 ```
 
-According to the diamond information given above D-F color interval is the highest purity. Then, G-F color scale follow. At least, K color takes place. Results illustrates that the number of G color is the highest. The most beautiful color, i.e., actually colorless, is D-F. Although the D is close to  bottom of the table, E and F take place in the second and third places of the table. Moreover, by using this table output, we can obtain minimum,maximum and average prices and compare the price of diamonds with each other by using color classification.
+As we mentioned before, according to the diamond information given above D-F color interval is the highest purity. Then, G-F color scale follow. At least, K color takes place. 
+Results,on the other hand, illustrates that 
 
-**According to the average prices, the most expensive diamonds are belongs to J if we just look for the color variable. So, it means that we can not explain the response (price) variable only with the color type of a diamond.**
+- The number of G color is the highest. 
+- The most beautiful color, i.e., actually colorless, is D-F. Although the D is close to  bottom of the table, E and F take place in the second and third places of the table. 
+
+Like the classification of the color according to the number of color in the dataset, by using this table output, we can obtain minimum,maximum and average prices and compare the price of diamonds with each other by using color classification. According to the average prices, the most expensive diamonds are belongs to *J* if we just look for the color variable. However, we expect that, as the D color is the best color in the data set, it should be most expensive.So, by using only color variable, we can not explain the response (price) variable.
+
 
 ## Clarity
 
 Clarity gives information about diamonds whether it contains stain or not. In this report, to find clarity classification of the data set, a kind of scatter plot is used.   
 
-```{r}
+```{r, fig.width=6, fig.height=4}
+
+
 diamonds %>%
   mutate(clarity = factor(clarity)) %>%
   group_by(clarity) %>%
   summarise(clarity_count = n()) %>%
-
-  ggplot(.,aes(x=clarity, y = clarity_count, color= clarity_count)) +
-    geom_point(size=9) +
-    geom_segment(aes(x=clarity,
-                     xend=clarity,
-                     y=0,
-                     yend=clarity_count))+
-    scale_fill_gradient("clarity_count", low="pink", high="pink2") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90), legend.position = "none")+
-        labs(title = "Classification Of Diamonds According to the Clarity",
+  
+  ggplot(., aes(x=clarity, y = clarity_count, fill = clarity_count)) +
+  geom_col() +
+  scale_fill_gradient("clarity_count", low="peachpuff", high="peachpuff4") +
+  geom_line(aes(y = clarity_count), size = 1.2, color="black", group = 1) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")+
+        labs(title = "The Number of Diamonds According to the Clarity",
          subtitle = st, 
          x = "Clarity",
-         y = "Number of Diamonds with Clarity")
-  
+         y = "Count")
 ```
 
 According to the results, 
@@ -476,39 +508,29 @@ diamonds %>%
   kable_minimal(full_width = F)
 ```
 
-**According to the average prices, the most expensive diamonds are belongs to SI2 if we just look for the clarity variable. So, it means that we can not explain the response (price) variable only with the clarity type of a diamond.**
-
 
 ## Carat
 
-Carat has two meanings: (i) the purity of the diamonds and (ii) the weight of the diamonds. In this data set, the carat illustrates the weight of the carat. To see the most used carat, the number of data is group according to the carat variable.
-
-```{r, include=FALSE}
-##Bunu kullanamayacağım
-getmode <- function(v) {
-   uniqv <- unique(v)
-   uniqv[which.max(tabulate(match(v, uniqv)))]
-}
-getmode(diamonds$carat)
-```
+Carat has two meanings: (i) the purity of the diamonds and (ii) the weight of the diamonds. In this data set, the carat illustrates the weight of the carat. To see the most used carat, the number of data is group according to the carat variable. The clarity variable is numeric type. For this reason, we do not apply bar chart illustration. However, to see the most preferable carat type in the data set, first, the clarity variable is transformed into factor variable type. Then, by using bar chart, the the most 20 preferable carats are listed. 
 
 
-```{r}
+```{r, fig.width=6, fig.height=4}
 diamonds %>%
   mutate(carat = factor(carat)) %>%
   group_by(carat) %>%
   summarise(carat_count = n())%>%
   arrange(desc(carat_count)) %>%
   head(20) %>%
-  ggplot(., aes(y=carat_count, x = reorder(carat, -carat_count), fill= carat)) +
+  
+  ggplot(., aes(x=carat_count, y = reorder(carat, carat_count), fill= carat)) +
   geom_col() +
   geom_text(aes(label = carat_count), size=3, color = "black", position = position_stack(vjust = 0.95)) +
   theme_minimal() +
   theme(legend.position = "none") +
-  labs(title = "The Most 20 Popular Carat",
+  labs(title = "The Most Preferable 20 Carat Size",
        subtitle = st,
        x = "Carat",
-       y = "Number of Count")
+       y = "Number of Diamonds")
 ```
 
 In the bar chart, there are the most 20 popular or preferable carat of diamonds are present. 
@@ -519,7 +541,6 @@ However, there are carats which are more than twenty. To see all carat according
 
 ```{r}
 diamonds %>%
-  mutate(carat = factor(carat)) %>%
   group_by(carat) %>%
   summarise(carat_count = n(),
             inPrice = min(price),
@@ -531,56 +552,181 @@ diamonds %>%
   scroll_box(width = "100%", height = "300px")
 ```
 
-Up until now, there are most important features of the diamonds are presented as a count analysis. After that point, relationship between variables and prices are illustrated.
-  
-## Price vs Variables
-
-### Price and Clarity Analysis by Color
+Like the number of carat, we also count the number of diamonds according to the cut,clarity and color. There is one difference between carat and these variables. The carat is numeric and these are not. For this reason, when we count these vraibles we do not need to transform our data from factor to numeric.
 
 ```{r}
+Color <- diamonds %>%
+  group_by(color) %>%
+  summarise(count = n())%>%
+
+  ggplot(., aes(x=count, y = reorder(color, count), fill= color)) +
+  geom_col() +
+  geom_text(aes(label = count), size=3, color = "black", position = position_stack(vjust = 0.95)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")+
+  labs(title = "The Number of Diamonds \n According to  Color",
+       subtitle = st,
+       y = "Color",
+       x = "Number of Diamonds")
+
+Cut <- diamonds %>%
+  group_by(cut) %>%
+  summarise(count = n())%>%
+
+  ggplot(., aes(x=count, y = reorder(cut, count), fill= cut)) +
+  geom_col() +
+  geom_text(aes(label = count), size=3, color = "black", position = position_stack(vjust = 0.95)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")+
+  labs(title = "The Number of Diamonds \n According to Cut",
+       subtitle = st,
+       y = "Cut",
+       x = "Number of Diamonds")
+
+Clarity <- diamonds %>%
+  group_by(clarity) %>%
+  summarise(count = n())%>%
+
+  ggplot(., aes(x=count, y = reorder(clarity, count), fill= clarity)) +
+  geom_col() +
+  geom_text(aes(label = count), size=3, color = "black", position = position_stack(vjust = 0.95)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")+
+  labs(title = "The Number of Diamonds \n According to Clarity",
+       subtitle = st,
+       y = "Clarity",
+       x = "Number of Diamonds")
+
+(Color | Cut  | Clarity)
+```
+The counting process shows that the G type in color, ideal in cut, and SI1 in clarity are the most used in this data set. 
+Up until now, there are most important features of the diamonds are presented as a count analysis. After that point, relationship between variables and prices are illustrated.
+
+## Price vs Variables
+
+### Price and X,Y,Z
+
+Since the x,y, and z variables are continuous numeric values, we can plot price according to these variables. In the graph, three plots are given in the same line. 
+
+```{r}
+XP <- diamonds%>%
+  ggplot(., aes(x,price)) +
+  geom_point(alpha=0.85)+
+  geom_smooth( color = "red")+
+  theme_minimal() +
+  labs(title = "X vs Price",
+       subtitle = st,
+       x= "X",
+       y = "Price")
+
+YP <- diamonds%>%
+  ggplot(., aes(y,price)) +
+  geom_point(alpha=0.85)+
+  geom_smooth( color = "red")+
+  theme_minimal() +
+  labs(title = "Y vs Price",
+       subtitle = st,
+       x= "Y",
+       y = "Price")
+
+ZP <- diamonds%>%
+  ggplot(., aes(z,price)) +
+  geom_point(alpha=0.85)+
+  geom_smooth(color = "red")+
+  theme_minimal() +
+  labs(title = "Z vs Price",
+       subtitle = st,
+       x= "Z",
+       y = "Price")
+
+(XP | YP | ZP)
+```
+
+Results show that there relationship bewteen price and x,y, and z variables respectively. After tat point, the price and 4C feature of the data is analyzed.
+
+### Price and Clarity by Color
+
+```{r,fig.width=6, fig.height=4}
 diamonds %>%
   group_by(clarity, color) %>%
   summarise(MeanPrice = mean(price)) %>%
-  
   ggplot(aes(x=clarity, y = MeanPrice, fill = color)) +
   geom_col(alpha = 0.8) +
   theme_minimal() +
   facet_wrap(~color) +
-  labs(title = "Relationship Analysis Between Price and Clarity By Color",
+  theme(axis.text.x = element_text(angle = 90))+
+  labs(title = "Price and Clarity by Color",
        subtitle = st,
        x = "Clarity",
        y = "Average Price",
        fill = "Color")
 ```
 
-**When we look at the best option of these two types, it has the highest average price among the others. But, when we look at the others, prices are decreasing when we increase the clarity for all types of color. So, it means that we can not still explain the price with these two variables.**
+To make interpretation, in this graphs, price and two variable is used. For this purpose, in the first EDA, the clarity and color are selected. In the *D* color, the highest price belongs to highest level of clarity as we expect. However, when we analyze the other colors, we obtain that the average price is getting smaller when the quality of clarity is getting better. This shows that, these two variable are not only variables which are affect the price.
 
-### Price and Cut Analysis by Clarity
+### Price and Cut, Color and Clarity
+
+Another examination is made by using cut and color. When we group our data according to the cut and color, we can obtain bar charts and moreover we can also shows average price values according to the classification. To make bar chart, the factor variable should be used. For this reason, three of 4C is analyzed. Thus, there is one more combination to analyze relationship between variables and price.
 
 ```{r}
-diamonds %>%
+b <- diamonds %>%
+  group_by(cut, color) %>%
+  summarise(avg_price = mean(price)) %>%
+  
+  ggplot(aes(x=cut, y= avg_price, fill = cut)) +
+  geom_col() +
+  facet_wrap(~color) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none") +
+  labs(title = "Price and Cut by Color",
+       subtitle = st, 
+       y = "Average Price",
+       x = "Quality of Cut")
+
+c<-diamonds %>%
   group_by(clarity, cut) %>%
   summarise(MeanPrice = mean(price)) %>%
   ggplot(aes(x=clarity, y = MeanPrice, fill = cut)) +
   geom_col(alpha = 0.8) +
   theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~cut) +
-  labs(title = "Relationship Analysis Between Price and Clarity by Cut",
+  labs(title = "Price and Clarity by Cut",
        subtitle = st,
        x = "Clarity",
        y = "Average Price",
        fill = "Cut")
+
+(b | c) #combination of the two plot in one line
 ```
 
-**We have the same results like the last plot. SI2, which is the second worst type of clarity, has the highest average price in all cut types. So, we can not explain the price variable with these two types.**
+When we analyze the given plots, the premium cut type has the highest average price. In addition, the best quality of cut, ideal, on the other hand nearly the lowest. This results also shows that, like the previous analysis, by using these two variable we do not explain the price. Like the previous two analysis, we get same result that is when the quality of the diamonds increase and at the same time clarity increases, the price does not increase in the same way. Moreover, with the best cut and clarity, the price is lowest. Thus, we can not explain the price variable with these two types.
 
+Lastly, we can summarize Price response variable by using 4C variables.
+
+```{r}
+diamonds%>%
+  group_by(carat,color,clarity, cut) %>%
+  summarise(MinPrice = min(price),
+            AveragePrice = mean(price),
+            MaxPrice = max(price)) %>%
+  arrange(desc(AveragePrice))%>%
+  select(carat, color, clarity, cut, MinPrice, AveragePrice, MaxPrice) %>%
+  kable(col.names = c("Carat", "Color", "Clarity","Cut", "Minimum Price","Average Price", "Maximum Price")) %>%
+  kable_styling("striped", full_width = T) %>%
+  scroll_box(width = "100%", height = "300px")
+```
+
+The shows that minimum, maximum and average price of the diamonds according to the cara,color, clarity and cut.
 
 ## Price Group Analysis
 
-```{r}
-quant = quantile(diamonds$price, seq(0, 1, 0.2))
+Until know, we analyze variables and relationship with prices. Now, by slicing the dataset into five, we can make some interpretation by using these price groups. 
 
-price_group <- diamonds %>%
+```{r,fig.width=6, fig.height=4}
+quant <- quantile(diamonds$price, seq(0, 1, 0.2))
+
+diamonds_price_group <- diamonds %>%
   mutate(price_group = case_when(
     price < quant[2] ~ "Very Low",
     price < quant[3] ~ "Low",
@@ -590,391 +736,481 @@ price_group <- diamonds %>%
   )) %>%
   mutate(price_group = factor(price_group, levels = c("Very Low", "Low", "Medium", "High", "Very High")))
 
-price_group %>%
-  group_by(cut, price_group) %>%
+diamonds_price_group %>%
+  group_by(color, price_group) %>%
   summarise(count=n()) %>%
   mutate(percentage = 100 * count / sum(count)) %>%
   ggplot(., aes(x = '', y = count, fill = price_group)) + 
   geom_bar(width = 1, stat = "identity", position = "fill") +
   coord_polar("y") +
   theme_void() +
+  scale_fill_manual(values=c("seashell2", "lightpink1", "seashell3", "paleturquoise3", "paleturquoise4")) +
   theme(plot.title = element_text(vjust = 0.5)) +
-  facet_wrap(~cut) +
-  labs(title = "Price Group Analyses of Cut",
+  facet_wrap(~color) +
+  labs(title = "Price Group Analyses of Color",
        subtitle = st,
        fill = "Price Group")
 ```
 
-**All cut types are equally distributed except Fair type. We have only percent Fair cut types in the data. So, there could be some grouping in the price groups. Also, we can see the results in a table below.**
-
+To make this analysis, the *color* variable is selected. Results shows that all price groups are distributed almost equally. However, when the color group is getting worst, the percentage of the high and very high price group increase. This situations shows the contrast with we expect. Moreover, this analysis supports our previous findings. 
+Also, we can see the results in a table below.
 
 ```{r}
-# diamonds_price_group %>%
-#   group_by(cut, price_group) %>%
-#   summarise(count=n()) %>%
-#   mutate(percentage = 100 * count / sum(count)) %>%
-#   select(cut, price_group, count)%>%
-#   pivot_wider(id_cols = cut, names_from = price_group, values_from = count) %>%
-#   kable(col.names = c("Cut", "Very Low","Low", "Medium", "High", "Very High"))%>% 
-#   kable_minimal(full_width = F) 
-
-
-price_group_vs_cut = price_group %>%
-  group_by(cut, price_group) %>%
+#calculation of the number of 
+PG_C = diamonds_price_group %>%
+  group_by(color, price_group) %>%
   summarise(count=n()) %>%
-  mutate(percentage = 100 * count / sum(count)) %>%
-  select(cut, price_group, count, percentage)%>%
-  pivot_wider(id_cols = cut, names_from = price_group, values_from = count)
-cut_percentage = price_group %>%
-  group_by(cut) %>%
+  select(color, price_group, count)%>%
+  pivot_wider(id_cols = color, names_from = price_group, values_from = count)
+
+#calculation of the percentage of the color
+ColorPercentage = diamonds_price_group %>%
+  group_by(color) %>%
   summarise(count=n()) %>%
   mutate(percentage = round(100 * count / sum(count),2)) %>%
-  select(cut,percentage)
-price_group_vs_cut %>%
-  inner_join(cut_percentage, by = "cut") %>%
-  kable(col.names = c("Cut", "Very Low","Low", "Medium", "High", "Very High", "Percentage"))%>% 
+  select(color,percentage)
+
+#by using left join we can merge these two table
+PG_C %>%
+  inner_join(ColorPercentage, by = "color") %>%
+  kable(col.names = c("Color", "Very Low","Low", "Medium", "High", "Very High", "Percentage"))%>% 
   kable_minimal(full_width = F) 
 ```
 
 
-
 ## Price Histogram
 
-```{r}
+Another price analysis can be made by using histogram. Histograms give information about the distribution of the variable in the first step. For this purpose, before preparing model, we can control the *histogram of the price*. 
+
+```{r, fig.width=6, fig.height=4}
 diamonds %>%
   ggplot(aes(x=price)) +
-  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "seashell3", color="seashell4") +
+  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "paleturquoise4", color="paleturquoise4") +
   geom_density(alpha=1, size = 1)+
   theme_minimal() +
-  labs(title = "Histogram of Price",
+  labs(title = "Price Distribution with Histogram",
        subtitle = st,
        x = "Price",
        y = "Count")
 ```
 
-The histogram shows that the price in diamonds dataset is right skewed. It looks like exponentianl distribution, for this reason we can implemet log transformation.
+The histogram shows that the price in diamonds dataset is right skewed. Moreover, we can say that the price distribution has exponential distribution. For this reason,we can re-plot the histogram by using log transformation on the response variable price.
 
-```{r}
+```{r, fig.width=6, fig.height=4}
 diamonds %>%
   ggplot(aes(x=log(price))) +
-  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "seashell3", color="seashell4") +
+  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "paleturquoise4", color="paleturquoise4") +
   geom_density(alpha=1, size = 1)+
   theme_minimal() +
-  labs(title = "Histogram of Price",
+  labs(title = "Price Distribution with Log Tranformation ",
        subtitle = st,
        x = "Price",
        y = "Count")
 ```
 
-**When we plot the log transformation of the prices, we didn’t get the shape of the normal distribution. So, we should not try linear models for this data. Because of that we can try glm, decision trees etc.**
+The transformed price histogram does not illustrate the specific shape of the normal distribution.To make prediction about the price, to create model becomes more suitable in this step. For this reason, in the next step, classification algorithm and prediction models are created. According to the models,we can predict price. 
 
-# Predicting Model
+# Clustering
 
-There are categorical variables. For this reason we do not use PCA test to find relationship. The other classification methods such as MSC, K-Means, etc can be used.
-
-```{r ,include=FALSE, eval=FALSE}
-diamonds_categoric <-
-  diamonds %>%
-  mutate(cut = as.factor(cut),
-         color = factor(color),
-         clarity = factor(clarity))
-
-diamonds_categoric %>%
-  glimpse()
-typeof(diamonds_categoric)
-
-#diamonds_hc <- hclust(as.dist(diamonds_categoric), method = "single")
-#plot(diamonds_hc, hang = -1)
-
-carat_cluster <- kmeans(diamonds_categoric$table, centers = 10)
-clusters <- data.frame(price=names(carat_cluster), cluster_mds = carat_cluster$cluster) %>%
-  arrange(cluster_mds,table)
-clusters
-```
-
-Before make a classification for this dataset, we need additional packages:
-
-1. [data.table](https://www.rdocumentation.org/packages/data.table/versions/1.8.10/topics/data.table): for rearrange the dataset to transform categoric variable to numeric variable.
-2. [rpart](https://www.rdocumentation.org/packages/rpart/versions/4.1-15/topics/rpart): to obtain regressşon tree
-3. [rpart.plot](https://www.rdocumentation.org/packages/rpart.plot/versions/3.0.8/topics/rpart.plot)
-4. [rattle](https://www.rdocumentation.org/packages/rattle/versions/5.4.0): provide graphical user interface
-
-
-```{r additional packages}
-library(data.table)
-library(rpart)
-library(rpart.plot)
-library(rattle)
-```
-
-
-## Classification Model
-
-The diamonds dataset includes both numeric and categorical variables. For this reason, before the make classification, first the categorical variables should be transformed into numeric variable. To get this purposes, the following codes can be used.
-
-```{r, categorical to numeric}
-diamonds2 <- setDT(diamonds) # by using setDT function we convert data frame to data table
-
-#cut, clarity, and color are the categorical variable of this dat set. When we translate this variables to numeric and assign them into the variable, we can obtain numeric variables.
-
-diamonds2$cut <- as.numeric(diamonds2$cut)  
-diamonds2$clarity <- as.numeric(diamonds2$clarity)
-diamonds2$color <- as.numeric(diamonds2$color)
-
-#After the transformation, we can check by using typeof() function or we can use function of dplyr() feature which is glimpse()
-#glimpse() shows the variables, variables futures and first examples
-diamonds2 %>%
-  glimpse()
-```
-
-Through the above transformation, the all variables are obtained as numeric.
-
-```{r, include = FALSE}
-diamonds2 <- setDT(diamonds)
-diamonds2$cut <- as.numeric(diamonds2$cut)
-diamonds2$clarity <- as.numeric(diamonds2$clarity)
-diamonds2$color <- as.numeric(diamonds2$color)
-#glimpse(diamonds2)
-```
-
-By using correlation function, we can obtain distance matrix for the dataset. In this dataset, we try to estimate price for this reason to make classification and get distance matrix, the price variable is removed from the data set by using data.table function. 
-
-```{r, distance matrix}
-diamonds_dist <- 1-cor(diamonds2[,!c("price")])
-max(diamonds2[,!c("price")]) # maximum value of the data set without price varible
-min(diamonds2[,!c("price")]) # minimum value of the data set without price variable
-```
-
-Since the difference between maximum and minimum value in the dataset, we need to scale to prevent domination one of the variables to others.
-
-```{r, scale process}
-distance <- cmdscale(diamonds_dist,k=2) #scale process for the data set
-colnames(distance) <- c("x","y") # renaming of the columns
-distance
-```
-
-Then we can prepare the classification of the variables by using following codes. To get classification, `kmeans()` function is used. 
+To make model and predict the price variable. First, we need to divide data set into two pieces: train data and test data. By using train data, we can create a model for the data set, and then by using test data we can control the accuracy of the model obtained by using train data. Following codes provide the production of the train and test data set. Creating of the train and test data is random process, for this reason we use `set.seed()` function to get same two dataset. 
 
 ```{r}
-set.seed(15) # to provide getting same classification with random process
-cluster<-kmeans(distance,centers=4) # application of k-means algorithm for variables
-#cluster
+#this data process is obtain from the course assignment page, for this reason set.seed value is not changed. 
+set.seed(503)
+#test data
+diamonds_test <- diamonds %>% 
+                    #to divide data set to, we add diamond id for each row
+                    mutate(diamond_id = row_number()) %>% 
+                    # we group data set according to the cut,color and clarity
+                    group_by(cut, color, clarity) %>%   
+                    # by using sample_frac() function, we get 20% of the data as test data
+                    sample_frac(0.2) %>%                  
+                    ungroup()    
 
-mds_clusters<-data.frame(genre=names(cluster$cluster),cluster_mds=cluster$cluster) %>% 
-  arrange(cluster_mds,genre) 
+#train data
+#by using anti_join we get different rows from data set.
+diamonds_train <- anti_join(diamonds %>% mutate(diamond_id = row_number()),  
+    diamonds_test, by = "diamond_id")
 
-mds_clusters%>%  
-  select( cluster_mds) %>%
-  kable(col.names = c("Cluster")) %>%
-  kable_minimal(full_width = FALSE)
-
-#visualization of the data set
-ggplot(data.frame(distance) %>% 
-         mutate(clusters=as.factor(cluster$cluster),genres=rownames(distance)),aes(x=x,y=y))  +
-geom_text(aes(label=genres,color=clusters),angle=45,size=4) + 
-  geom_point(data=as.data.frame(cluster$centers),aes(x=x,y=y)) +
-  theme_minimal() +
-  labs(title = "K-Means Classification",
-       subtitle = "Diamonds Data set without price",
-       x= "X",
-       y= "Y",
-       color = "Clusters")
+#then to make clear analysis we need to extract diamond_id column by using following codes.
+diamonds_train <- diamonds_train[, c(-ncol(diamonds_train))]
+diamonds_test  <- diamonds_test[, c(-ncol(diamonds_test))]
 ```
 
-The table and figure shows the classification of the variables of this data set. According to the results, 
-
-- Clarity and Table variables create two different cluster and in these classes there are only one variables.
-- Carat, x, y, and z variables form one group, whereas, color,cut and depth creates the other group.
-
-```{r, include = FALSE}
-
-yr_dist <- 1-cor(diamonds2[,!c("price")])
-distance <- cmdscale(yr_dist,k=2) #scale process for the data set
-
-colnames(distance) <- c("x","y") # renaming of the columns
-
-cluster<-kmeans(distance,centers=4) # application of k-means algorithm for variables
-
-mds_clusters<-data.frame(genre=names(cluster$cluster),cluster_mds=cluster$cluster) %>% 
-  arrange(cluster_mds,genre)
-
-mds_clusters %>%
-  glimpse() #structure of the data set
-
-#visualization of the data set
-ggplot(data.frame(distance) %>% 
-         mutate(clusters=as.factor(cluster$cluster),genres=rownames(distance)),aes(x=x,y=y))  +
-geom_text(aes(label=genres,color=clusters),angle=45,size=2) + 
-  geom_point(data=as.data.frame(cluster$centers),aes(x=x,y=y)
-)
-```
-
-Before, we made classification for the variables in the data set. Moreover, same classification can be prepared for the observations of dataset. For this purpose, first, we need to scaled data frame. Thus, we standardize the data set by using minimum and maximum value of the each column/variable. For this purpose, `sapply()` function is used.
+After the division of the data set into test and train, we extract the diamonds_id column to make clear analysis. After that poin, we can transform factor variable to numeric variable by using `as.numeric()` function. That is, all the ordered columns, we will use them as numeric values.
 
 ```{r}
-diamonds2scale <- sapply(diamonds2[,-7], function(x) {(x-min(x))/(max(x)-min(x))})
-
-set.seed(15) # to provide getting same classification with random process
-cluster<-kmeans(diamonds2scale,centers=8)
-#cluster
-
-100*round(1 - (cluster$tot.withinss/cluster$totss), digits = 4)
+#we transform our factor variable to numeric variable, then we assign new variable to their own variables by using following codes.
+diamonds_train$cut <- as.numeric(diamonds_train$cut)
+diamonds_train$clarity <- as.numeric(diamonds_train$clarity)
+diamonds_train$color <- as.numeric(diamonds_train$color)
+diamonds_test$cut <- as.numeric(diamonds_test$cut)
+diamonds_test$clarity <- as.numeric(diamonds_test$clarity)
+diamonds_test$color <- as.numeric(diamonds_test$color)
 ```
 
-In the above *k-means* application, we obtain eighth classes to classify dataset. In this trial, we obtain the number of classroom as deterministically, i.e., we set the number of group as eighth. However, by making some interpretations with output of the k-means functions. Thus, the *for loop* is created as foolow, and the outputs are visualized by using `ggplot()` function.In this example, the number of group is determined between 1 to 15.  
+## Principal Component Analysis
 
-```{r, include=FALSE}
-#maximum value in the data set without price variable
-#max(diamonds2[,-7])
+Principle component analysis (PCA) is used to provide less variable from the data set with huge number of variables. In other words, by using PCA, we can decrease number of columns. To make PCCA, we use `princomp()` function which belongs to  base R. 
 
-#k-means application for diamonds data set without price variable
-#cluster<-kmeans(diamonds2[,-7],centers=4)
-
-#plot representation of the k-means of dimaonds data set
-# mds_clusters<-data.frame(genre=names(cluster$cluster),cluster_mds=cluster$cluster) %>% 
-#   arrange(cluster_mds,genre)
-
-# to see variable of the data set
-# mds_clusters %>%
-#   glimpse()
-
-
-# plot representation of the k-means of dimaonds data set
-# ggplot(data.frame(distance) %>% 
-#          mutate(clusters=as.factor(cluster$cluster),genres=rownames(distance)),aes(x=x,y=y))  +
-# geom_text(aes(label=genres,color=clusters),angle=45,size=2) + 
-#   geom_point(data=as.data.frame(cluster$centers),aes(x=x,y=y)
-# )
-#cluster
-diamonds2scale <- sapply(diamonds2[,-7], function(x) {(x-min(x))/(max(x)-min(x))})
-#diamonds2scale
-
-#Columns of the k-means results
+```{r}
 set.seed(157)
-cluster<-kmeans(diamonds2scale,centers=8)
-cluster
-#cluster$withinss
-#cluster$totss
-#cluster$size
-
-
-
-100*round(1 - (cluster$tot.withinss/cluster$totss), digits = 4)
-
-  #diamonds2$cluster <- cluster$cluster
-
-
-#ggplot(diamonds2, aes(x=carat, y = price ,color = as.factor(cluster))) +
-#  geom_point(alpha=0.5)
-
+#into numeric variable. But to provide accuracy, by using sapply function we select only numeric variable to implement PCA.
+diamonds_pca <- princomp(as.matrix(diamonds_train[,sapply(diamonds_train, class) == "numeric"]),cor=T)
+summary(diamonds_pca,loadings=TRUE)
 ```
 
+The summary shows that four components can almost explain 88% of the data. By using these four component we can prepare variables and them into the data sets.  
 
 ```{r}
-errors = c()
-for (i in (1:15)){
-  set.seed(15) #provide getting same results with random function 
-  cluster<-kmeans(diamonds2scale,centers=i) # application of the k-means function with i number of group size
-  errors = c(errors, 100*round(1 - (cluster$tot.withinss/cluster$totss), digits = 3)) # calculation of the fulfillment of the clusters to data.
+#by using following function we can add this pca variables into data set
+#since we select the four component, we add four variables into data set
+
+#Train data set
+PCAResults = predict(diamonds_pca, newdata = diamonds_train) # prediction by using data set
+diamonds_train$PCA1 <- PCAResults[,1] # adding variable into data
+diamonds_train$PCA2 <- PCAResults[,2]
+diamonds_train$PCA3 <- PCAResults[,3]
+diamonds_train$PCA4 <- PCAResults[,4]
+
+#Test data set
+PCAResultsTest = predict(diamonds_pca, newdata = diamonds_test) # prediction by using data set
+diamonds_test$PCA1 <- PCAResultsTest[,1] # adding variable into data
+diamonds_test$PCA2 <- PCAResultsTest[,2]
+diamonds_test$PCA3 <- PCAResultsTest[,3]
+diamonds_test$PCA4 <- PCAResultsTest[,4]
+```
+
+## Clustering
+
+Like PCA, we can also* make clustering process by using this data sets. As the difference between values in each variable is different, we need to use scale process in the data set to implement *K-means*. Because if a column would have much higher values respect to other columns, it can dominate the rest.By using this clustering, we can create a feature with using the clustering.To be able to scale the data we need the minimum and maximum values of the train dataset. We will scale both train and test set with the same values.
+
+```{r}
+MinValues = sapply(diamonds_train[,c("cut", "clarity", "color", "carat", "depth", "table", "x", "y", "z")], min)
+MaxValues = sapply(diamonds_train[,c("cut", "clarity", "color", "carat", "depth", "table", "x", "y", "z")], max)
+```
+
+We get each variables minimum and maximum variables, now we need to implement scaling process into our data sets. In this process, we try to subtract vector form each row of the matrix data set. To make it easy, we can use `sweep()` function. By using the [sweep](https://stackoverflow.com/questions/24520720/subtract-a-constant-vector-from-each-row-in-a-matrix-in-r) function we can make calculation with vector and matrix.  
+
+```{r}
+diamonds_train_scale <- sweep(sweep(diamonds_train[,c("cut", "clarity", "color", "carat", "depth", "table", "x", "y", "z")], 2, MinValues), 2, MaxValues - MinValues, "/")
+```
+
+By using this process, we can obtain scaled data set. In other words, every value in each column is between 0 and 1. Thus, one value does not dominate each other. By using K-means algorithm, we can create different clusters, i.e., we can prepare or select number of cluster. Like we learn in the class, we can find number of cluster for data set by comparing errors. Then, we plot these errors value and choose a number of cluster.
+
+```{r}
+#by using following functions we obtain new column namely cluster. 
+#this column shows that tows cluster
+ErrorsKMEANS = c()
+for (i in (1:17)){
+  #provide getting same results with random function
+  set.seed(157)  
+  # application of the k-means function with i number of group size
+  cluster<-kmeans(diamonds_train_scale,centers=i)
+  # calculation of the fulfillment of the clusters to data.
+  ErrorsKMEANS = c(ErrorsKMEANS, 100*round(1 - (cluster$tot.withinss/cluster$totss), digits = 3)) 
 }
 
-errors_df <- data.frame(x=c(1:15), y=errors) # creating data frame with errors.
+# creating data frame with errors.
+Errors_df <- data.frame(x=c(1:17), y=ErrorsKMEANS) 
 
-ggplot(errors_df, aes(x=x, y=y)) +
-  geom_point(color = "seashell4") +
-  geom_line(color="seashell4") +
-  geom_text(aes(label = errors), size=3, color = "black", position = position_stack(vjust = 0.95))+
+#by using ggplot function we visualize the errors between 1:17.
+ggplot(Errors_df, aes(x=x, y=y)) +
+  geom_point(color = "paleturquoise4") +
+  geom_line(color="paleturquoise4") +
+  geom_text(aes(label = ErrorsKMEANS), size=3, color = "black", position = position_stack(vjust = 0.95))+
   theme_minimal() +
-  labs(title = "Classification of Observations",
-       subtitle = "Diamond data set",
+  labs(title = "Erros' Line Plot",
+       subtitle = st,
        x = "X",
        y = "Y")
-
 ```
 
-```{r,include=FALSE}
-
-## Hata alıyoruz dist oluştururken
-# nrow(diamonds2scale)
-# sum(is.na(diamonds2scale))
-# 
-# distance2 = as.dist(distance)
-# typeof(distance2)
-# glimpse(distance2)
-# 
-# yr_dist <- 1-cor(diamonds2)
-# 
-# yr_hc<-hclust(yr_dist, method = "complete", members = NULL)
-
-```
+When we analyze the proportion of the of the increase of the errors, the decrease in errors are slowly changing after the cluster with 6 centers. For this reason, we can select six as a number of cluster. 
 
 ```{r}
-## 508 dersindeki gibi lineer regresyonda önceki assumptionları kontrol edeceğiz.
-## modeli kuaracağız.
-
-cor(diamonds2) #korelasyon
-#plot(diamonds)
-
-# regression <- lm(log(price)~., data = diamonds2)
-# summary(regression)
-# plot(regression)
-
-gen_regression <- lm(price~carat+color+cut+clarity+table+depth, data = diamonds)
-summary(gen_regression)
-plot(gen_regression)
-
+set.seed(157)
+BC <- kmeans(diamonds_train_scale,centers=6) # BC: Best cluster obtained form the k-means
+#we assign our cluster values into the train data set
+diamonds_train$cluster <- as.factor(BC$cluster)
 ```
 
 
-```{r}
-set.seed(503)
-library(tidyverse)
+The classification of the train data set according to the new defined data set, cluster. In this data set, there are at most second cluster, whereas third cluster has the lowest value in the data set. 
 
-#Test Data set
-diamonds_test <- diamonds %>% 
-    mutate(diamond_id = row_number()) %>% 
-    group_by(cut, color, clarity) %>% 
-    sample_frac(0.2) %>% 
-    ungroup()
+```{r, fig.width=5, fig.height=3}
+diamonds_train %>%
+  group_by(cluster)%>%
+  summarise(cluster_count = n()) %>%
+  
+  ggplot(., aes(x=cluster_count, y = reorder(cluster, cluster_count))) +
+  geom_col(fill = "paleturquoise4")+
+  theme_minimal() +
+  labs(title = "Number of Cluster in Data Set",
+       subtitle = st,
+       x = "Number of cluster",
+       y = "Cluster")
 
-diamonds_test
-
-#Train Data Set
-diamonds_train <- anti_join(diamonds %>% 
-                              mutate(diamond_id = row_number()), diamonds_test, by = "diamond_id")
-
-```
-
-```{r}
-diamonds_test %>%
-  glimpse()
 
 diamonds_train %>%
-  glimpse()
-
-library(rpart)
-library(tidyverse)
-library(rpart.plot)
-library(rattle)
-rpart_model <- rpart(price~., data=diamonds)
-
-fancyRpartPlot(rpart_model)
+  group_by(cluster)%>%
+  summarise(cluster_count = n()) %>%
+  select(cluster, cluster_count) %>%
+  kable(col.names = c("Cluster", "Number of Cluster"))%>% 
+  kable_minimal(full_width = F) 
 ```
 
+
+Up until now, we scale our train data set and create cluster for this data set by using k-means algorithm. Then we define best number of cluster, 6. Then, we need to control our clustering by using test data set. To make this test, following code is used. This code is implemented from a [Stackoverflow](https://stackoverflow.com/questions/20621250/simple-approach-to-assigning-clusters-for-new-data-after-k-means-clustering) page. This page, can be examined in detail. 
+
+```{r}
+#we get variables of the data set and by using sweep function we can arrange data set as scaled one.
+diamonds_test_scale <- sweep(sweep(diamonds_test[,c("cut", "clarity", "color", "carat", "depth", "table", "x", "y", "z")], 2, MinValues), 2, MaxValues - MinValues, "/")
+
+closest.cluster <- function(x) {
+  cluster.dist <- apply(BC$centers, 1, function(y) sqrt(sum((x-y)^2)))
+  return(which.min(cluster.dist)[1])
+}
+diamonds_test$cluster <- as.factor(apply(diamonds_test_scale, 1, closest.cluster))
+```
+
+Now, we have enough data to create models for this data sets. In the next section, by using all outputs and process in the previous sections, the best predicting model is prepared. 
+
+# Predicting Model Creation
+
+Before we start to to prepare prediction model, we can control the correlation between variables. 
+
+```{r,fig.width=5, fig.height=4}
+a <- diamonds %>%group_by(price, carat) %>%
+      ggplot(aes(x=carat, y = price)) +
+      geom_point() + theme_minimal() +geom_smooth(color="red")
+b <- diamonds %>%group_by(price, cut) %>%
+      ggplot(aes(x=cut, y = price)) +
+      geom_point()+ theme_minimal() 
+c <- diamonds %>%
+      group_by(price, color) %>%
+      ggplot(aes(x=color, y = price)) +
+      geom_point()+ theme_minimal() 
+d <- diamonds %>%group_by(price, clarity) %>%
+      ggplot(aes(x=clarity, y = price)) +
+      geom_point()+ theme_minimal() 
+e <- diamonds %>%group_by(price, depth) %>%
+      ggplot(aes(x=depth, y = price)) +
+      geom_point()+ theme_minimal() 
+f <- diamonds %>%group_by(price, table) %>%
+      ggplot(aes(x=table, y = price)) +
+      geom_point()+ theme_minimal() 
+g <- diamonds %>%group_by(price, x) %>%
+      ggplot(aes(x=x, y = price)) +
+      geom_point()+ theme_minimal() +geom_smooth(color="red")
+h <- diamonds %>%group_by(price, y) %>%
+      ggplot(aes(x=y, y = price)) +
+      geom_point()+ theme_minimal() +geom_smooth(color="red")
+ı <- diamonds %>%group_by(price, z) %>%
+      ggplot(aes(x=z, y = price)) +
+      geom_point()+ theme_minimal() + geom_smooth(color="red")
+
+(a | b | c) /
+(d | e | f) /
+(g | h | ı)  
+```
+The graph shows relationship between price and other variables, moreover we can obtain the relationship between price and other variables by using `cor()` and [corrplot()](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) function.
+
+```{r, fig.width=4, fig.height=4}
+diamonds_cor <-cor(diamonds_train[-c(11:15)])
+corrplot(diamonds_cor, method="number", type = "upper")
+```
+
+Like the scatter plot results, the correlation matrix also shows that there is correlation between price and *carat*, *x*, *y*, and *z* variables. Moreover, there are high correlation between independent variables. This means that, when the change occurred in one of the independent variable from carat, x,y,z, the change becomes in other variable.  
+After the correlation, we can try to make prediction models. 
+
+## Linear Regression Model 
+
+There are some prediction models: some of them **unsupervised model**, whereas, some them are named as **supervised models**. PCA and K-means classifications are located in the unsupervised models. In this model, we do not know the how we make prediction. In contrast, we know the response variable. Linear regression models belongs to supervised models. 
+
+For this purpose, first linear regression model (LM) is implemented. To obtain prepare model by using linear regression model, we need to check assumptions. If the model provide each assumption, this model can be used. Hence, first we create lm model and then we plot the result of the linear regression. Two important assumptions are
+
+1. Normality of data
+2. Randomness of variance
+
+```{r, eval=FALSE, fig.width=5, fig.height=5}
+#lm() function is used to construct linear model.
+#since we add the pca results, we need to extract this variable from the dataset. 
+#to create a model we use train data set.
+LinearModel <- lm(price ~ . - PCA1 - PCA2 - PCA3 - PCA4, data = diamonds_train)
+# to control the variables and p-value of regression results we can use summary() function
+summary(LinearModel)
+
+#after the creating of the regression model, by using visualization we can control basic two assumptions
+ResidualPlot <- plot(LinearModel,1) #Residuals vs Fitted graph
+QQplot <- plot(LinearModel,2) #Normal Q-Q plot
+```
+
+In this analysis, illustration of the regression is not given, but when the plots analyzed the increased variance is observed. By using log, 1/y, or square root transformation on the y (response variable). But to make this transformation we can use `glm()` function to construct *generalized linear model*
+
+## Generalized Linear Model 
+
+As we mentioned before, to use generalized linear model is not good way. As we have continuous response variable, to use generalized linear model (GLM). There are two different family and four link function. In this analysis, **Gaussian** is used as family function and **identity** is used as link function. 
+
+```{r}
+#By using train data and glm()  we can create regression model.
+#But in contrast to normal implementation. In this process we need to starting point. 
+#for this purpose we assign value into state for each variable.
+#when the internet shows the 0.5 for the example, I use this value but it can be changed.
+
+#Model1
+GLModel1 <- glm(price ~ . - PCA1 - PCA2 - PCA3 - PCA4, data = diamonds_train, family = Gamma(link = "identity"), start = c(0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5))
+summary(GLModel1)
+```
+
+When we analyze the results, the p-value of the cut variable is too high. It is far away from the 0.05. For this reason, we need to remove this variable from the dataset and then we need to control the variables with the following lines.
+
+```{r}
+#Second glm
+#since the cut is not significant we remove from the data set.
+GLModel2 <- glm(price ~ . - PCA1 - PCA2 - PCA3 - PCA4 - cut, data = diamonds_train, family = Gamma(link = "identity"),  start = c(0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5))
+summary(GLModel2)
+```
+
+According to results, the model is significant. We can use this model. However, this model can be analyzed with more detailed way. Because, in this model, correlated variables are used in the model. This can be create conflict. Another options can be tried. *Note that the another family function, Gaussian, can be used.*
+
+In addition to this best model, we can also create by using PCA values. For this following columns are used. Since, the PCA values are created by using variables of the data set, we only used this values to create different values.
+
+```{r}
+#Model created by using PCA values
+GLModel3 = glm(price ~ PCA1 + PCA2 + PCA3 + PCA4 , data = diamonds_train, family = Gamma(link = "sqrt"))
+summary(GLModel3)
+```
+
+By using PCA components, we get new regression model. The last model provides that by using less component according to the real data set. For this reason, we expect that higher AIC value, which provide the definition of the best model in the AIC. The lowest AIC value is good.Now,there is two different glm model. By using **AIC** value,we can select one of them.
+
+- AIC value of  the best model, **GLModel2**, is 679723
+- AIC value of  the PCA model, **GLModel2**, is 706708.
+
+As the lowest AIC value belongs to GLModel2, it is selected to test data set.
+
+## Classification And Regression Tree
+
+Another supervised model is *Classification and Regression Tree* models, i.e., **CART**. It is a predicted model and it is a model that explains how an outcome variable's values can be predicted based on other values. To create CART model, we use `rpart()` function which belongs to base R. 
+To create a CARt model, again we use *diamonds_train* dataset. After the creating of the model, there are several visualization methods like `prp()`, `fancyRpartPlot`, and so on. In this example, `fancyRpartPlot` plot is used.
+
+```{r}
+#creating of the CART model
+ModelCART <- rpart(price~. -PCA1 - PCA2 - PCA3 - PCA4 - cluster, data=diamonds_train)
+#visualization of CARt model 
+fancyRpartPlot(ModelCART, 
+               palettes=c( "Oranges"),
+               main = "Decision Tree \n",
+               type = 2,
+               sub = " \n Ebru Geçici") 
+```
+
+By using obtain tree, we can examine nodes and define the divisions. According to the results, some variables are used as division parameters. In this output, we shows that *y* and *clarity* are main parameters or affecting values in the dataset. In other words, these variables are better features to reduce the variance in the dataset with default argument. 
+This tree is obtain by using default variables, by changing the default values like *cp*, we can obtain different models and we can select the best of them. In this analysis, the default values are used. 
+
+Now we create two different models, one of them obtain from the glm function and the other one is obtained from the CART, tree analysis. However, we also need to test our models by using test data set for each model. First, We predict glm model, then we control the CART model. Then by using error, we can compare the result and select the best model. 
+
+```{r}
+#GLM prediction model
+#To predict price we can use predict function with the best glm model
+GLModel2Prediction <-predict(GLModel2, newdata=diamonds_test)
+
+#PRS: Prediction R Square
+GLModel2PRS <- 1 - (sum((GLModel2Prediction-diamonds_test$price)^2)/sum((diamonds_test$price-mean(diamonds_train$price))^2))
+GLModel2PRS
+```
+
+
+```{r,fig.width=5, fig.height=4}
+PredRealGLM <- as.data.frame(cbind(GLModel2Prediction, diamonds_test$price))
+colnames(PredRealGLM) = c("Prediction", "Real")
+
+PredRealGLM %>%
+  ggplot(.,aes(x=Prediction, y=Real)) +
+  geom_point(alpha = 0.7)  +
+  theme_minimal()+
+  geom_abline(intercept = 0, slope = 1, color="red",size=1) +
+  labs(title = "Prediction vs Actual ",
+       subtitle = st,
+       x = "Predictions Values of GLM ",
+       y = "Real Values of GLM")
+```
+
+According to the results, we obtain *R Square* value as 0.81. This means that our model explains our data set with 81%. We need to make same calculation for CART model.
+
+```{r}
+#GLM prediction model
+#To predict price we can use predict function with the best glm model
+ModelCARTPrediction <-predict(ModelCART, newdata=diamonds_test)
+
+#PRS: Prediction R Square
+ModelCARTPRS <- 1 - (sum((ModelCARTPrediction-diamonds_test$price)^2)/sum((diamonds_test$price-mean(diamonds_train$price))^2))
+ModelCARTPRS
+```
+
+Also we obtain R square value for the CART model and the result shows that the CART model R Square value is higher than the GLM. This means that, the CART model explains the data set instead of GLM.
+
+Moreover we can also visualize this result. 
+
+```{r, include=FALSE}
+GLModel2PRS   #R Square value of the glm 
+ModelCARTPRS  #R Square value of the CART model
+#This process shows that whether the glm model' R Square value is greater than R Square value of CART model.
+GLModel2PRS > ModelCARTPRS
+```
+
+The R Square value of the glm model is smaller than the CART model. That is the CART model is the best model in the obtained model. In this model only *y* and *clarity* variables are used. This is also good for us because in the glm model almost all variables are located in the model. However, there are correlation between independent variables. 
 
 
 # Conclusion
 
+In this analysis, first, the data set is prepared for the analysis. In other words,
+
+- NA values,
+- Duplicated values,
+- Logic errors are defined. 
+
+If necessary, some of the data are removed from the dataset. After this process some analysis and prediction models are created. In the analysis part **Exploratory Data Analysis**, i.e., *EDA*, are made. By using these analyses, the some table outputs and visual representations are given. In this data set both numeric and ordered/categorical variables take place. For this reason, to get visualization of categorical variables, bar chart and this kind of plots are used. For numeric variables, the scatter plots are chosen. According to the this result, we can list following output:
+
+1. When we analyze each variable one by one, the price decrease from the best type of diamond to worse.
+2. The most preferable carat type is 0.3 carat. Moreover, the G type in color, ideal in cut, and SI1 in clarity are the most used in this data set.
+3. Price has right skewed histogram. When we implement log transformation into we do not obtain normal distribution of the price variable.
+
+Moreover, by using *unsupervised* and *supervised* techniques, we create classification for diamond dataset by using **k-means** algorithm and **PCA** algorithm. Then the output of this classification methods are added into the model as a new variable. These models present unsupervised model. Then to make prediction about price, the supervised models are used. First, **linear regression (LM)** is implemented. Unless, the assumptions of the linear regression are not provided. For this reason **generalized regression model (GLM)** is implemented by using family *Gamma* and *identity* link function instead of making transformation of y in linear regression. Then the best model is obtained and this model is tested by using test dataset. After that, another model is implemented for the same data set with **Classification And Regression Tree (CART)**. The results of the both models are compared by using R Square and the best model is selected. As a result of model prediction,
+
+1. Assumptions of the linear regression are not fulfilled.
+2. Generalized Regression model with Gamma family and Identity link function is implemented and the best model is obtain without *cut variable*
+3. Second model is implemented by using Classification And Regression Tree.
+4. According to the comparison of the GLM and CART models CART model is selected as best model with  0.8768922.
+
+
 # References
+
+1. Related Notebooks in the Kaggle
 
 [Kaggle Notebook1 - Predicting Diamond Prices with Linear Regression](https://www.kaggle.com/datasciencecat/predicting-diamond-prices-with-linear-regression)<br>
 [Kaggle Notebook2 - Diamond Exploration Price Modeling](https://www.kaggle.com/abhishekheads/diamond-exploration-price-modeling)<br>
-[EDA Example with Diamonds data set](http://rstudio-pubs-static.s3.amazonaws.com/400929_1fe468939a9c4d9c8cf8e8768ab5fb3c.html)
+[EDA Example with Diamonds data set](http://rstudio-pubs-static.s3.amazonaws.com/400929_1fe468939a9c4d9c8cf8e8768ab5fb3c.html)<br>
+[Lecture Note 1](https://mef-bda503.github.io/archive/fall17/files/intro_to_ml.html)<br>
+[Lecture Note 2](https://mef-bda503.github.io/archive/fall17/files/intro_to_ml_2.html)<br>
+
+2.Information About Diamonds
 
 [Diamonds](https://www.yadavjewelry.com/info/diamond-education/your-complete-diamond-characteristics-guide#:~:text=Actually%20diamond%20has%20four%20main,they%20affect%20the%20diamond's%20price.) <br>
 [Diamonds Color](https://www.bluenile.com/education/diamonds/color) <br>
 [Diamonds-Wikipedia](https://en.wikipedia.org/wiki/Diamond) <br>
+
+3. Related Functions and Packages
+
 [Duplicated Value](https://www.datanovia.com/en/lessons/identify-and-remove-duplicate-data-in-r/)<br>
 [Color Cheatsheet](https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf)<br>
+[Pie Chart Color](http://www.sthda.com/english/wiki/ggplot2-pie-chart-quick-start-guide-r-software-and-data-visualization)<br>
 [Geom Histogram](http://www.sthda.com/english/wiki/ggplot2-histogram-plot-quick-start-guide-r-software-and-data-visualization)<br>
-[setDT function](https://www.rdocumentation.org/packages/data.table/versions/1.13.0/topics/setDT)
+[Ideal Cut](https://www.diamonds.pro/education/diamond-depth-and-table/#:~:text=For%20a%20cushion%20cut%20diamond,or%2069%20to%2070%20percent)<br>
+[Depth Percentages](https://www.withclarity.com/education/diamond-education/diamond-cut/what-is-diamond-depth-or-diamond-education#:~:text=Diamond%20depth%20is%20a%20crucial%20factor%20of%20a%20diamond's%20cut.&text=The%20second%20is%20the%20diamond,diameter%2C%20then%20multiplying%20by%20100)<br>
+[Mode Function](https://www.tutorialspoint.com/r/r_mean_median_mode.htm)<br>
+[Sweep Function](https://stackoverflow.com/questions/20596433/how-to-divide-each-row-of-a-matrix-by-elements-of-a-vector-in-r)<br>
+[Cluster for Test Data](https://stackoverflow.com/questions/20621250/simple-approach-to-assigning-clusters-for-new-data-after-k-means-clustering)<br>
+[corrplot()](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)<br>
+[CART Color](https://www.rdocumentation.org/packages/rattle/versions/5.4.0/topics/fancyRpartPlot)<br>
+[Stackoverflow for Scaling of Test Data](https://stackoverflow.com/questions/20621250/simple-approach-to-assigning-clusters-for-new-data-after-k-means-clustering)<br>
