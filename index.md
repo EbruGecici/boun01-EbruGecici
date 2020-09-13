@@ -26,7 +26,7 @@ By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 In the third individual, there are three different options to present and it is expected that one of these are chosen to make analysis. For this reason, I select `diamond price estimation`. 
 
 - Detail of the assignment: [html](https://mef-bda503.github.io/archive/fall17/files/assignment_diamonds_data.html)
-
+- Assignment report: [html](Assignment3son.html)
 
 ### **Group Assignments and Projects**
 #### [Data Mine'R's](https://pjournal.github.io/boun01g-data-mine-r-s/)
