@@ -10,7 +10,7 @@
 The R Markdown assignment consists of the creating a new R Markdown file and analysing of some blogs, pages, and videos, which are related to **R**.
 The information in the assignment 1 is related to Covid-19 and R combination. In additon to that, this assignment also includes information about my academic background. 
 
-- [R Markdown](Introduction.html)
+- R Markdown: [html](Introduction.html)
 
 
 ### Assignment 2: *Electricty Market Price*
@@ -18,7 +18,7 @@ The information in the assignment 1 is related to Covid-19 and R combination. In
 The second assignment is related to implementation and practise of the dplyr() function and ggplot() function.
 By using EPIAS 01-31 July 2020 data, some examples are made in this assignment.
 
-- [dplyr() and ggplot()](Assignment2.html)
+- dplyr() and ggplot(): [html](Assignment2.html)
 
 
 ### Assignment 3: *Diamond Price Estimation*
@@ -45,12 +45,16 @@ In the group project, we analyze the 2020 online car market Turkey by using [kag
 - Proposal: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Proposal.html)
 - Data Preprocessing: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Preprocessing.html)
 - Exploratory Data Analysis: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/ExploratoryDataAnalysis.html)
-- Shiny App:
-- Final Report: 
+- Shiny App: You can run the shiny app by just typing the following code in your own R-console; shiny::runGitHub("pjournal/boun01g-data-mine-r-s", subdir = "Project", ref = "gh-pages")
+- Models: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Model.html)
+- Presentation: [html](https://pjournal.github.io/boun01g-data-mine-r-s/Project/Presentation.html#1)
 
 ### Bonus: *data.table*
 
 For bonus projcet, we choose [data.table](https://cran.r-project.org/web/packages/data.table/index.html). In this project, first we create a tutorial to explain this package and record a video to show information which we learn. 
+
+- CRAN: [html](https://cran.r-project.org/web/packages/data.table/index.html)
+- Tutorial: [html](https://pjournal.github.io/boun01g-data-mine-r-s/data.table/datatable.html)
 
 ### **Exercises**
 
